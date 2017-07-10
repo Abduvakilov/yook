@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet' href='/stylesheets/style.css')
+    h1= title
+    form(action='/search' method='get')
+      input(type="text" name="searchTerm" placeholder=query)
+      button(type="submit") Поиск в Tas-ix
+    if(locals.results)
+      ul
+        for result in results
+          li
+            a(href=result._source.link)= result._source.title
+            p= result._source.description
