@@ -11,6 +11,7 @@ const
     }).driver(request('windows-1251'));
 
 const START_URL = "http://megasoft.uz/",
+    SHORT_ADDRESS = "megasoft.uz",
     MAX_PAGES_TO_VISIT = 1000000;
 
 let numPagesVisited = 0,
@@ -25,7 +26,7 @@ function crawl() {
     // fs.writeFile('megasoft.json', json, 'utf-8', function(error){if(error){console.error(error); return}});
     return;
   }
-  elastic.nextPage(function(nextPage){
+  elastic.nextPage(SHORT_ADDRESS, function(nextPage){
 
     if (nextPage){
       elastic.exists(nextPage, function(exists){

@@ -11,6 +11,7 @@ const
     })
 
 const START_URL = "http://mytube.uz/",
+    SHORT_ADDRESS = "mytube.uz",
     MAX_PAGES_TO_VISIT = 1000000;
 
 let numPagesVisited = 0,
@@ -23,7 +24,7 @@ function crawl() {
     console.log("Reached max limit of number of pages to visit.");
     return;
   }
-  elastic.nextPage(function(nextPage){
+  elastic.nextPage(SHORT_ADDRESS, function(nextPage){
 
     if (nextPage){
       elastic.exists(nextPage, function(exists){

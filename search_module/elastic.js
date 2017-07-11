@@ -66,11 +66,21 @@ module.exports = {
 		})
 	},
 
-	nextPage: function(callback){
+	nextPage: function(site, callback){
 		client.search({
 		    index: "crawl", 
 		    type: "crawled",
-		    q: 'crawled:false'
+		    body: {
+					size : 7,
+					query: {
+						bool: {
+							must: [
+								{match: { _id: site }},
+								{match: {crawled: true}}
+							]
+						}
+					}
+				}
 	  	}, function (error, response) {
 			if (error) {
 		      console.error(error);
