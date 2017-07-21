@@ -1,6 +1,15 @@
 const elastic = require('./../search_module/elastic'),
     request = require('./charset'),
     entities = require('entities'),
+    options = {
+      method: "GET",            //Set HTTP method
+      jar: true,              //Enable cookies
+      headers: {              //Set headers
+        "User-Agent": "Firefox/48.0"
+      }
+    },
+    makeDriver = require('request-x-ray'),
+    driver = makeDriver(options),    //Create driver
     u = require('url'),
     Xray = require('x-ray'),
     x = Xray({
@@ -21,17 +30,16 @@ const elastic = require('./../search_module/elastic'),
           return typeof value === 'string' ? parseInt(value) : value
         }
       }
-    }).driver(request('windows-1251')) 
+    }).driver(request('windows-1251'))
+        .driver(driver);
 
 const START_URL = "http://topmusic.uz",
     SHORT_ADDRESS = "topmusic.uz",
     MAX_PAGES_TO_VISIT = 100000,
-    SCRAPE_OBJECT = {  
+    SCOPE = '.inside',
+    SELECTOR = {
       title: '.fl.video-title | whiteSpace | decode',
       description: ['div.desc p:not(.cat-date):not(.tags)| decode'],
-      views: 'span.fr.views | parseInt',
-      likes: 'table.r-desc td.like@html | parseInt',
-      dislikes: 'table.r-desc td.dislike@html | parseInt',
       category: 'p.cat-date a | decode',
       datePublished: 'p.cat-date@html | afterATag | decode | whiteSpace',
       tags: ['p.tags a | decode'],
@@ -44,7 +52,7 @@ function condition (obj){
 let numPagesVisited = 0,
     url = START_URL;
 
-elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl() );
+elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl );
 
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
@@ -73,7 +81,7 @@ function visitPage(url, callback) {
   numPagesVisited++;
   console.log("Visiting page " + numPagesVisited + ': ' + url);
 
-  x(url, SCRAPE_OBJECT)(function (err, obj) {
+  x(url, SCOPE, SELECTOR)(function (err, obj) {
     if (err) {
       console.error(err);
       callback();
@@ -86,7 +94,7 @@ function visitPage(url, callback) {
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, final )       
         );
-      } else final()
+      } else final();
       
       function final(){
         for (i = 0; i < obj.pageLinks.length; i++) {
@@ -105,4 +113,4 @@ function visitPage(url, callback) {
       }
     }
   });
-};
+}

@@ -17,7 +17,7 @@ const elastic = require('./../search_module/elastic'),
           return typeof value === 'string' ? value.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/ +/g, ' ').replace(/'/g, "''").trim() : value
         }
       }
-    }).driver(driver) 
+    }).driver(driver);
 
 const START_URL = "http://mytube.uz/",
     SHORT_ADDRESS = "mytube.uz",
@@ -67,7 +67,7 @@ function visitPage(url, callback) {
       console.error(err);
       callback();
     } else {
-      console.log(obj)
+      console.log(obj);
       let time = elastic.getDateTime();      
       
       if (obj.category !== undefined && url.startsWith(START_URL)) {
@@ -75,7 +75,7 @@ function visitPage(url, callback) {
         console.log('video found at page ' + url);
         obj.crawledDate = time;
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final);
-      } else final()
+      } else final();
       
       function final(){      
         elastic.linksToVisit(obj.pageLinks, SHORT_ADDRESS, function(){

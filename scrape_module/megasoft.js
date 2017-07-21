@@ -17,7 +17,7 @@ const START_URL = "http://megasoft.uz/",
 let numPagesVisited = 0,
     url = START_URL;
 
-elastic.update("crawled", START_URL, {doc: {crawled: false}, doc_as_upsert : true}, crawl() );
+elastic.update("crawled", START_URL, {doc: {crawled: false}, doc_as_upsert : true}, crawl );
 
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
@@ -64,14 +64,14 @@ function visitPage(url, callback) {
       if (obj.downloadLink) {
         console.log('downloadLink found at page ' + url);
         obj.crawledDate = time;
-        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final());
-      } else final()
+        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final);
+      } else final();
       
       function final(){      
         elastic.linksToVisit(obj.pageLinks, function(){
-          elastic.update("crawled", url, {doc: {crawled: true, crawledDate: time }, doc_as_upsert : true}, callback() )       
+          elastic.update("crawled", url, {doc: {crawled: true, crawledDate: time }, doc_as_upsert : true}, callback )
         })
       }
     }
-  });;
-};
+  });
+}

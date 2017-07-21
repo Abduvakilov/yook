@@ -33,7 +33,7 @@ const START_URL = "https://alltor.me",
 let numPagesVisited = 0,
     url = START_URL;
 
-elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl() );
+elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl);
 
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
@@ -77,7 +77,7 @@ function visitPage(url, callback) {
           console.error(err);
           callback();
         } else {
-          console.log(obj)
+          console.log(obj);
           let time = elastic.getDateTime();      
           
           if (obj.description !== undefined) {
@@ -87,7 +87,7 @@ function visitPage(url, callback) {
             elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
               elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, callback )       
             );
-          } else final()
+          } else final();
           
           function final(){      
             elastic.linksToVisit(obj.pageLinks, SHORT_ADDRESS, function(){

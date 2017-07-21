@@ -22,7 +22,7 @@ module.exports.search = function(searchData, callback) {
   }).then(function (resp) {
     callback(resp.hits.hits);
   }, function (err) {
-      callback(err.message)
+      callback(err.message);
       console.log(err.message);
   });
-}
+};
