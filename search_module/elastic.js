@@ -2,7 +2,9 @@ const elasticsearch = require('elasticsearch'),
     client = elasticsearch.Client({
       host: '127.0.0.1:9200',
       log: 'error'
-    });
+    }),
+    http = require('http'),
+    https = require('https');
 
 var n = 0;
 
@@ -15,7 +17,7 @@ module.exports = {
 		    body: body 
 	  }, function(error, response) {
 		    if (error) {
-		      // console.error(error);
+		      console.error(error);
 		      // return;
 		    }
 		    else {
@@ -49,6 +51,7 @@ module.exports = {
 			index: 'crawl',
 			type: 'crawled',
 			body: {
+				size : 1,
 				query: {
 					bool: {
 						must: [
@@ -74,10 +77,7 @@ module.exports = {
 					size : 7,
 					query: {
 						bool: {
-							must: [
-								{match: { _id: site }},
-								{match: {crawled: true}}
-							]
+							must: {match: {crawled: site}}
 						}
 					}
 				}
@@ -85,18 +85,18 @@ module.exports = {
 			if (error) {
 		      console.error(error);
 		      // return;
-		  } else if (response.hits.total !== 0) {
-					callback(response.hits.hits[n]._id);
-					if (n<7 && n<response.hits.total-2) n++; else n=0;
-			} else (console.log('no nextPage'))
+		  	} else if (response.hits.total !== 0) {
+				callback(response.hits.hits[n]._id);
+				if (n<6 && n<response.hits.total-2) n++; else n=0;
+			} else (console.log('no nextPage'));
 		})
 	},
-	linksToVisit: function(array, callback){
+	linksToVisit: function(array, short_address, callback){
       let i = 0;
       inner();
       function inner(){
          if (array[i]){
-           module.exports.create('crawled', array[i], {crawled: false});
+           module.exports.create('crawled', array[i], {crawled: short_address});
            i++;
            inner();
          } else {
@@ -104,6 +104,24 @@ module.exports = {
          }
       }
     },
+
+	checkUrl: function(url, failCallback, sucsessCallback){
+		if (url.startsWith('https')) {req = https} else {req = http};
+		req.get(url, function (res) {
+  			if (res.statusCode<299) {
+  				if (res.headers['content-type'].toUpperCase().includes('HTML')) {
+  					sucsessCallback()
+  				} else {
+  					console.log('not HTML on '+url)
+					module.exports.update("crawled", url, {doc:{crawled: 'not html'}, doc_as_upsert : true}, failCallback());
+  				}
+  			} else {
+  				console.log('code>299 on '+url)
+				module.exports.update("crawled", url, {doc:{crawled: 'code>299'}, doc_as_upsert : true}, failCallback());
+  			}
+		});
+	},
+
 	// notCrawled: function(url){
 	// 	client.update({
 	// 	    index: "crawl", 
@@ -144,7 +162,6 @@ module.exports = {
 
 	    return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
 	}
-
 }
 
 // module.exports.nextPage( function(re){

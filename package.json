@@ -9,8 +9,10 @@
   "dependencies": {
     "debug": "~2.6.3",
     "elasticsearch": "^13.2.0",
+    "entities": "^1.1.1",
     "express": "~4.15.2",
     "pug": "^2.0.0-rc.2",
+    "request-x-ray": "^0.1.4",
     "serve-favicon": "~2.4.2",
     "superagent": "^3.5.2",
     "superagent-charset": "^1.2.0",
