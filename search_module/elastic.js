@@ -112,11 +112,11 @@ module.exports = {
   				if (res.headers['content-type'].toUpperCase().includes('HTML')) {
   					sucsessCallback()
   				} else {
-  					console.log('not HTML on '+url)
+  					console.log('not HTML on '+url);
 					module.exports.update("crawled", url, {doc:{crawled: 'not html'}, doc_as_upsert : true}, failCallback());
   				}
   			} else {
-  				console.log('code>299 on '+url)
+  				console.log('code>299 on '+url);
 				module.exports.update("crawled", url, {doc:{crawled: 'code>299'}, doc_as_upsert : true}, failCallback());
   			}
 		});
@@ -162,7 +162,7 @@ module.exports = {
 
 	    return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
 	}
-}
+};
 
 // module.exports.nextPage( function(re){
 //     // We've already visited this page, so repeat the crawl

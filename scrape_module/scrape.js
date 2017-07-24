@@ -96,7 +96,7 @@ function visitPage(url, callback) {
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, final )       
         );
-      } else final()
+      } else final();
       
       function final(){
         for (i = 0; i < obj.pageLinks.length; i++) {

@@ -4,6 +4,8 @@ const request = require('superagent')
 var superagent = charset(request);
 /// END OF CHANGE
 
+module.exports = driver;
+
 function driver(enc, opts) {
   var agent = superagent.agent(opts || {})
 
