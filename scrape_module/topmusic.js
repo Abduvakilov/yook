@@ -26,7 +26,8 @@ const elastic = require('./../search_module/elastic'),
 const START_URL = "http://topmusic.uz",
     SHORT_ADDRESS = "topmusic.uz",
     MAX_PAGES_TO_VISIT = 100000,
-    SCRAPE_OBJECT = {  
+    SCOPE = '.inside'
+    SELECTOR = {  
       title: '.fl.video-title | whiteSpace | decode',
       description: ['div.desc p:not(.cat-date):not(.tags)| decode'],
       views: 'span.fr.views | parseInt',
@@ -39,7 +40,7 @@ const START_URL = "http://topmusic.uz",
     };
 function condition (obj){
   return  obj.views !== undefined
-}
+};
 
 let numPagesVisited = 0,
     url = START_URL;
@@ -73,7 +74,7 @@ function visitPage(url, callback) {
   numPagesVisited++;
   console.log("Visiting page " + numPagesVisited + ': ' + url);
 
-  x(url, SCRAPE_OBJECT)(function (err, obj) {
+  x(url, SCOPE, SELECTOR)(function (err, obj) {
     if (err) {
       console.error(err);
       callback();
