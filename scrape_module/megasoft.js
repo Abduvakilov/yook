@@ -58,9 +58,9 @@ function visitPage(url, callback) {
       console.error(err);
       callback();
     } else {
-      
-      let time = elastic.getDateTime();      
-      
+          
+      let time = new Date().toISOString();
+
       if (obj.downloadLink) {
         console.log('downloadLink found at page ' + url);
         obj.crawledDate = time;

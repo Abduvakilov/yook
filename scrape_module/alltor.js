@@ -78,7 +78,7 @@ function visitPage(url, callback) {
           callback();
         } else {
           console.log(obj);
-          let time = elastic.getDateTime();      
+          let time = new Date().toISOString();    
           
           if (obj.description !== undefined) {
             console.log(obj);

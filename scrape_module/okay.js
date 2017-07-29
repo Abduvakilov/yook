@@ -32,8 +32,8 @@ const elastic = require('./../search_module/elastic'),
       }
     }).driver(request('windows-1251'), driver)
 
-const START_URL = "http://topmusic.uz/",
-    SHORT_ADDRESS = "topmusic.uz",
+const START_URL = "http://okay.uz/",
+    SHORT_ADDRESS = "okay.uz",
     MAX_PAGES_TO_VISIT = 100000,
     SCOPE = 'body',
     artistPage = {

@@ -68,7 +68,7 @@ function visitPage(url, callback) {
       callback();
     } else {
       console.log(obj);
-      let time = elastic.getDateTime();      
+      let time = new Date().toISOString();
       
       if (obj.category !== undefined && url.startsWith(START_URL)) {
         console.log(obj);
