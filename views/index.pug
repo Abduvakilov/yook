@@ -3,13 +3,20 @@ html
   head
     title= title
     link(rel='stylesheet' href='/stylesheets/style.css')
-    h1= title
+    //- h1= title
+  body
+    hr
     form(action='/search' method='get')
-      input(type="text" name="searchTerm" placeholder=query)
+      input(type="text" name="searchTerm" autofill="false" required value=query)
       button(type="submit") Поиск в Tas-ix
+    hr
     if(locals.results)
-      ul
+      span= took
+      span ms vaqt sarflandi
+      section.results
         for result in results
-          li
-            a(href=result._source.link)= result._source.title
+          div.result
+            a(href=result._source.link)
+              h3= result._source.title
+            div.link= result._source.link
             p= result._source.description

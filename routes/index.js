@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var searchModule = require('../search_module/search');
+var search = require('../search_module/search');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -9,11 +9,14 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/search', function(req, res) {
-  searchModule.search(req.query, function(data) {
-    res.render('index', { title: 'Поиск в Tas-ix', results: data, query: req.query.searchTerm });
-    console.log(req.body);
-    console.log(data);
-  });
+	let searchTerm = req.query.searchTerm;
+	if (searchTerm !== '') {
+		search(searchTerm, function(data) {
+			res.render('index', { title: 'Поиск в Tas-ix', took:data.took, results: data.hits.hits, query: searchTerm });
+			console.log(req.query);
+			console.log(data);
+	  	});
+	} else res.render('index', { title: 'Поиск в Tas-ix' });
 });
 
 module.exports = router;

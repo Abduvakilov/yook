@@ -5,7 +5,7 @@ var client = elasticsearch.Client({
     log: 'error'
   });
 
-module.exports.search = function(searchData, callback) {
+module.exports = function(searchTerm, callback) {
   client.search({
     index: 'epubs',
     body: {
@@ -13,14 +13,14 @@ module.exports.search = function(searchData, callback) {
         bool: {
           must: {
             match: {
-              "title": searchData.searchTerm
+              title: searchTerm
             }
           }
         }
       }
     }
   }).then(function (resp) {
-    callback(resp.hits.hits);
+    callback(resp);
   }, function (err) {
       callback(err.message);
       console.log(err.message);
