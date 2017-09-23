@@ -10,7 +10,8 @@ a {
 input {
 	border: solid 1px silver;
 	border-radius: 6px;
-	width: 500px;
+	max-width: 500px;
+	width: 100%;
 	/*height: 25px;*/
 	font-size: 18px;
 	padding: 5px;
@@ -26,13 +27,18 @@ button {
 }
 .result {
 	border: 1px solid silver;
-	border-radius: 3px;
+	border-radius: 5px;
+    box-shadow: 2px 2px 1px 0 silver;
 	margin: 10px;
-	padding: 0 100px;
+	padding: 0 40px;
+	max-width: 700px;
 }
 .result h3 {
 	margin: 15px 0 8px;
 }
 .link {
 	color: #33ff00;
+}
+.noresult {
+	margin: 15px;
 }

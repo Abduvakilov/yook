@@ -1,35 +1,40 @@
 const elastic = require('./../search_module/elastic'),
-    // request = require('./charset'),
-    entities = require('entities'),
+    request = require('./charset'),
+    options = {
+      method: "GET",            //Set HTTP method
+      jar: true,              //Enable cookies
+      headers: {              //Set headers
+        'user-agent': 'Mozilla/5.0'
+      }
+    },
+    makeDriver = require('request-x-ray'),
+    driver = makeDriver(options),    //Create driver
     u = require('url'),
     Xray = require('x-ray'),
     x = Xray({
       filters: {
         whiteSpace: function (value) {
           return typeof value === 'string' ? value.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/ +/g, ' ').replace(/'/g, "''").trim() : value
-        },
-        decode: function (value) {
-          return typeof value === 'string' ? entities.decodeHTML(value) : value
-        },
-        replaceLineBreak: function (value) { 
-          return typeof value === 'string' ? value.replace(/\<br\>/g, ';;') : value
         }
       }
-    })
+    }).driver(driver);
 
-const START_URL = "https://alltor.me",
-    SHORT_ADDRESS = "alltor.me",
-    SCOPE = 'body@html | decode | replaceLineBreak | whiteSpace',
+const START_URL = "http://mytube.uz/",
+    SHORT_ADDRESS = "mytube.uz",
+    MAX_PAGES_TO_VISIT = 1000000,
     SELECTOR = {  
-      title: 'h1.maintitle',
-      description:'.post_wrap:contains("Скачать бесплатно и на максимальной скорости!")',
-      category: ['#main_content table:first-of-type .nav.w100 a:not(:first-child)'],
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href^="magnet:?"]):not([href$=".jpg"]):not([href*="&view="])@href']
-    },
-    MAX_PAGES_TO_VISIT = 100000;
-function condition (obj){
-  return  obj.description !== undefined
-};
+      title: 'h2',
+      description:'#aboutUser pre | whiteSpace',
+      // videoLink: 'a[href*=".mp4"]@href',
+      category: '.userinfobox-categories-tags-container a:first-child | whiteSpace',
+      tags: ['.userinfobox-categories-tags-container a:not(:first-child) | whiteSpace'],
+      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]@href']
+    }
+    reindex = false;
+
+    function condition(obj){
+      return  (obj.category !== undefined && url.startsWith(START_URL));
+    };
 
 let numPagesVisited = 0,
     url = START_URL;
@@ -63,30 +68,34 @@ function visitPage(url, callback) {
   numPagesVisited++;
   console.log("Visiting page " + numPagesVisited + ': ' + url);
 
-  x(url, SCOPE, SELECTOR)(function (err, obj) {
+  x(url, SELECTOR)(function (err, obj) {
     if (err) {
       console.error(err);
       callback();
     } else {
-      let time = new Date().toISOString();
-      
+      let time = new Date().toISOString();     
+      let pageLinks = obj.pageLinks;
+      delete obj.pageLinks
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
-        console.log(obj)
         obj.crawledDate = time;
+        // console.log(obj)
+
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
-          elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, callback )       
+          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+                params : {time : time}
+              }}, final )       
         );
-      } else final()
+      } else final();
       
       function final(){
-        for (i = 0; i < obj.pageLinks.length; i++) {
-          if (!u.parse(obj.pageLinks[i]).hostname.includes(SHORT_ADDRESS)){
-            console.log('___________________________' + obj.pageLinks.splice(i, 1));
+        for (i = 0; i < pageLinks.length; i++) {
+          if (!u.parse(pageLinks[i]).hostname.includes(SHORT_ADDRESS) || !pageLinks[i].startsWith('http') || pageLinks[i].includes('mytube.uz/uz/') || pageLinks[i].includes('mytube.uz/oz/')) {
+            console.log('___________________________' + pageLinks.splice(i, 1));
           }
-          if (i >= obj.pageLinks.length - 1 ){
+          if (i >= pageLinks.length - 1 ){
             // console.log(obj);
-            elastic.linksToVisit(obj.pageLinks, SHORT_ADDRESS, function(){
+            elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
               elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
                 params : {time : time}
               }}, callback)
@@ -96,6 +105,4 @@ function visitPage(url, callback) {
       }
     }
   });
-
-
 };

@@ -3,12 +3,15 @@ const elasticsearch = require('elasticsearch'),
       host: '127.0.0.1:9200',
       log: 'error'
     }),
+    u = require('url'),
     http = require('http'),
-    https = require('https');
+    https = require('https'),
+    date = require('./date')
 
 var n = 0;
 
 module.exports = {
+	date: date,
 	update: function(type, id, body, callback){
 		client.update({
 		    index: "crawl", 
@@ -91,23 +94,30 @@ module.exports = {
 			} else (console.log('no nextPage'));
 		})
 	},
-	linksToVisit: function(array, short_address, callback){
+	linksToVisit: function(array, short_address, callback, reindex){
       let i = 0;
       inner();
       function inner(){
          if (array[i]){
-           module.exports.create('crawled', array[i], {crawled: short_address});
-           i++;
-           inner();
+         	if (reindex) {
+         		module.exports.update('crawled', array[i], {doc:{crawled: short_address}, doc_as_upsert : true});
+         	} else module.exports.create('crawled', array[i], {crawled: short_address});
+        	i++;
+        	inner();
          } else {
            callback();
          }
       }
     },
 
-	checkUrl: function(url, failCallback, sucsessCallback){
+	checkUrl: function(url, failCallback, sucsessCallback, anyStatus){
 		if (url.startsWith('https')) {req = https} else {req = http};
-		req.get(url, function (res) {
+		let options = {
+		    host: u.parse(url).hostname,
+		    headers: {'user-agent': 'Mozilla/5.0'},
+		    path: u.parse(url).path
+		};
+		req.get(options, function (res) {
   			if (res.statusCode<299) {
   				if (res.headers['content-type'].toUpperCase().includes('HTML')) {
   					sucsessCallback()
@@ -115,6 +125,7 @@ module.exports = {
   					console.log('not HTML on '+url);
 					module.exports.update("crawled", url, {doc:{crawled: 'not html'}, doc_as_upsert : true}, failCallback());
   				}
+  			} else if (anyStatus) {sucsessCallback()
   			} else {
   				console.log('code>299 on '+url);
 				module.exports.update("crawled", url, {doc:{crawled: 'code>299'}, doc_as_upsert : true}, failCallback());

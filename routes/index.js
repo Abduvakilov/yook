@@ -10,11 +10,13 @@ router.get('/', function(req, res, next) {
 
 router.get('/search', function(req, res) {
 	let searchTerm = req.query.searchTerm;
+	let from = 0;
+	if ( !isNaN(parseInt(req.query.startsWith)) ){
+		from = parseInt(req.query.startsWith);
+	}
 	if (searchTerm !== '') {
-		search(searchTerm, function(data) {
-			res.render('index', { title: 'Поиск в Tas-ix', took:data.took, results: data.hits.hits, query: searchTerm });
-			console.log(req.query);
-			console.log(data);
+		search(searchTerm, from, function(data) {
+			res.render('index', { title: 'Поиск в Tas-ix',  query: searchTerm, took:data.took, total: data.hits.total, results: data.hits.hits, startsWith: from});
 	  	});
 	} else res.render('index', { title: 'Поиск в Tas-ix' });
 });

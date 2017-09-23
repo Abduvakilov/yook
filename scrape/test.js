@@ -20,20 +20,18 @@ var x = Xray({
         }
 	}
 });//.driver(driver);//.driver(request('windows-1251'));
-var fileUrl = 'http://okay.uz/front/home/music_albom/59';
+var fileUrl = 'http://mytube.uz';
+var SHORT_ADDRESS = 'mytube.uz';
 const SCOPE = '.order, .order1, .content',
-	SELECTOR = {
-		artist : 'h3.title@html | beforeDivTag | whiteSpace',
-		clips : x('.clips p', [{
-			name: 'a',
-			link: 'a@href'
-		}]),
-		singles : x('.audio li', [{
-			name: 'p',
-			link: '.download@href'
-		}])
-	}
-x(fileUrl, SCOPE, SELECTOR)
+	SELECTOR = {  
+      title: 'h2',
+      description:'#aboutUser pre | whiteSpace',
+      // videoLink: 'a[href*=".mp4"]@href',
+      category: '.userinfobox-categories-tags-container a:first-child | whiteSpace',
+      tags: ['.userinfobox-categories-tags-container a:not(:first-child) | whiteSpace'],
+      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]@href']
+    }
+x(fileUrl, SELECTOR)
 (function(err, obj){
 	if (err) console.log(err);
 	console.log(obj);

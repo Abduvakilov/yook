@@ -12,12 +12,13 @@ const
 
 const START_URL = "http://megasoft.uz/",
     SHORT_ADDRESS = "megasoft.uz",
-    MAX_PAGES_TO_VISIT = 1000000;
+    MAX_PAGES_TO_VISIT = 1000000,
+    reindex = false;
 
 let numPagesVisited = 0,
     url = START_URL;
 
-elastic.update("crawled", START_URL, {doc: {crawled: false}, doc_as_upsert : true}, crawl );
+elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl );
 
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
@@ -61,16 +62,18 @@ function visitPage(url, callback) {
           
       let time = new Date().toISOString();
 
-      if (obj.downloadLink) {
+      if (obj.downloadLink.length !== 0) {
         console.log('downloadLink found at page ' + url);
         obj.crawledDate = time;
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final);
       } else final();
       
       function final(){      
-        elastic.linksToVisit(obj.pageLinks, function(){
-          elastic.update("crawled", url, {doc: {crawled: true, crawledDate: time }, doc_as_upsert : true}, callback )
-        })
+        elastic.linksToVisit(obj.pageLinks, SHORT_ADDRESS, function(){
+          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            params : {time : time}
+          }}, callback, reindex);
+        });
       }
     }
   });

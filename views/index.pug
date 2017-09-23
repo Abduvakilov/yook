@@ -5,18 +5,39 @@ html
     link(rel='stylesheet' href='/stylesheets/style.css')
     //- h1= title
   body
-    hr
     form(action='/search' method='get')
       input(type="text" name="searchTerm" autofill="false" required value=query)
       button(type="submit") Поиск в Tas-ix
     hr
-    if(locals.results)
-      span= took
-      span ms vaqt sarflandi
+    if results
+      if total> 0 
+        span !{took/1000} сек. !{total} результатов.
+      else 
+        div.noresult
+          p По этому запросу в нашем каталоге файлов не найдено.
+          p В нашем каталоге вы можете найти видео, музыки, программи и многое другое в Tas-ix. 
+          br 
+          p Рекомендуем:
+          ul
+            li Убедитесь, что все слова написаны правильно
+            li Поищите в 
+              a(href='https://google.uz/search?q='+encodeURIComponent(query)) Google
+
       section.results
         for result in results
           div.result
-            a(href=result._source.link)
+            a(href=result._id)
               h3= result._source.title
-            div.link= result._source.link
-            p= result._source.description
+            div.link= result._id
+            //- if result.highlight.description.length
+            p !{result.highlight.description}
+      - startsWith = startsWith + 10
+      if startsWith>19
+        - var previous = startsWith - 20
+        a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+previous)   Предыдущая 
+        span  ⇦ 
+      if total> 0 
+        span Страница: !{startsWith/10} 
+      if total>startsWith
+        span ⇨ 
+        a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+startsWith)   Следующая

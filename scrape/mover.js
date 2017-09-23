@@ -1,16 +1,8 @@
 const elastic = require('./../search_module/elastic'),
-    request = require('./charset'),
+    // request = require('./charset'),
     entities = require('entities'),
-    options = {
-      method: "GET",            //Set HTTP method
-      jar: true,              //Enable cookies
-      headers: {              //Set headers
-        "User-Agent": "Firefox/48.0"
-      }
-    },
-    makeDriver = require('request-x-ray'),
-    driver = makeDriver(options),    //Create driver
     u = require('url'),
+    moment = require('moment'),
     Xray = require('x-ray'),
     x = Xray({
       filters: {
@@ -28,53 +20,35 @@ const elastic = require('./../search_module/elastic'),
         },
         parseInt: function (value){
           return typeof value === 'string' ? parseInt(value) : value
+        },
+        date: function (value) {
+          return typeof value === 'string' ? moment(value, 'DD MMMM YYYY', 'ru').format() : value
         }
       }
-    }).driver(request('windows-1251'), driver)
+    });
 
-const START_URL = "http://topmusic.uz/",
-    SHORT_ADDRESS = "topmusic.uz",
+const START_URL = "https://mover.uz",
+    SHORT_ADDRESS = "mover.uz",
     MAX_PAGES_TO_VISIT = 100000,
-    SCOPE = 'body',
-    artistPage = {
-      artist: x('.box-mid', {
-        artist: 'h2',
-        genre: 'a.color1',
-        clips: x('.clip-box', [{
-          name: 'a.clip-name',
-          link: 'a.clip-name@href'
-        }]),
-        singles: x('.block tr', [{
-          name: 'span',
-          link: 'a.download@href'
-        }]),
-      }),
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"]):not([href*="/play/"]):not([href*="/get/"])@href']
-    },
-    albumPage = {
-      album: x('.box-mid', {
-        name : 'tr:first-child td:nth-child(2)',
-        artist: 'tr:nth-child(2) td:nth-child(2)',
-        genre: 'tr:nth-child(3) td:nth-child(2)',
-        year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
-        link: 'tr:nth-child(6) td:nth-child(2) a@href',
-        songs: x('.block tr', [{
-          name: 'span',
-          link: 'a.download@href'
-        }]),
-      }),
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"]):not([href*="/play/"]):not([href*="/get/"])@href']
-    }
-function condition(obj){
-  if (SELECTOR === albumPage) {return true} else {;
-  return  obj.artist.genre !== undefined};
-};
+    SCRAPE_OBJECT = {  
+      title: '.fl.video-title | whiteSpace | decode',
+      description: ['div.desc p:not(.cat-date):not(.tags)| decode | whiteSpace'],
+      views: 'span.fr.views | parseInt',
+      likes: 'table.r-desc td.like@html | parseInt',
+      dislikes: 'table.r-desc td.dislike@html | parseInt',
+      category: 'p.cat-date a | decode',
+      datePublished: 'p.cat-date@html | afterATag | decode | whiteSpace | date',
+      tags: ['p.tags a | decode'],
+      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"])@href']
+    };
+function condition (obj){
+  return  !isNaN(obj.views);
+}
 
-let SELECTOR = {},
-    numPagesVisited = 0,
+let numPagesVisited = 0,
     url = START_URL;
 
-elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl );
+elastic.update("crawled", START_URL, {doc: {crawled: SHORT_ADDRESS}, doc_as_upsert : true}, crawl() );
 
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
@@ -90,11 +64,6 @@ function crawl() {
         }
         // New page we haven't visited
         else {
-          if (nextPage.includes('/album-')) {
-            SELECTOR = albumPage;
-          } else {
-            SELECTOR = artistPage;
-          }
           elastic.checkUrl(nextPage, crawl, function(){
             visitPage(nextPage, crawl)
           });
@@ -108,25 +77,23 @@ function visitPage(url, callback) {
   numPagesVisited++;
   console.log("Visiting page " + numPagesVisited + ': ' + url);
 
-  x(url, SCOPE, SELECTOR)(function (err, obj) {
+  x(url, SCRAPE_OBJECT)(function (err, obj) {
     if (err) {
       console.error(err);
       callback();
     } else {
-      let time = new Date().toISOString();     
+      let time = new Date().toISOString();
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks
+
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
+        console.log(obj);
         obj.crawledDate = time;
-        console.log(obj)
-
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
-          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
-              }}, callback )       
+          elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, final )       
         );
-      } else final();
+      } else final()
       
       function final(){
         for (i = 0; i < pageLinks.length; i++) {
@@ -134,7 +101,6 @@ function visitPage(url, callback) {
             console.log('___________________________' + pageLinks.splice(i, 1));
           }
           if (i >= pageLinks.length - 1 ){
-            // console.log(obj);
             elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
               elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
                 params : {time : time}
@@ -145,4 +111,4 @@ function visitPage(url, callback) {
       }
     }
   });
-}
+};
