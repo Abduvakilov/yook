@@ -26,5 +26,5 @@ function finalize(date, isDayFirst) {
 		return moment(format(date, isDayFirst), 'YYYY-MM-DD hh:mm').format()
 	}
 }
-// console.log(finalize('Сегодня 22:19', true))
+// console.log(finalize('22 сентября 2017 г.', true))
 module.exports = finalize

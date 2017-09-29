@@ -6,7 +6,7 @@ const elasticsearch = require('elasticsearch'),
     u = require('url'),
     http = require('http'),
     https = require('https'),
-    date = require('./date')
+    date = require('../modules/date')
 
 var n = 0;
 

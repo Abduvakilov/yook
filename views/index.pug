@@ -29,7 +29,7 @@ html
             a(href=result._id)
               h3= result._source.title
             div.link= result._id
-            //- if result.highlight.description.length
+            if result.highlight.description != undefined
             p !{result.highlight.description}
       - startsWith = startsWith + 10
       if startsWith>19

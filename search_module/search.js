@@ -1,12 +1,12 @@
 const elasticsearch = require('elasticsearch'),
-    transl = require('./transl'),
+    //transl = require('../modules/transl'),
     client = elasticsearch.Client({
       host: '127.0.0.1:9200',
       log: 'error'
     });
 
 module.exports = function(searchTerm, from, callback) {
-  searchTerm = searchTerm + ' ' + transl(searchTerm)
+  //searchTerm = searchTerm + ' ' + transl(searchTerm)
   console.log(searchTerm)
   client.search({
     index: 'crawl',
@@ -15,7 +15,8 @@ module.exports = function(searchTerm, from, callback) {
       query: {
         multi_match: {
           query: searchTerm,
-          fields: ['title^3', 'description']
+          fields: ['title^3', 'description'],
+          fuzziness: 1
         }
       },
       size: 10,

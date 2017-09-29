@@ -1,6 +1,6 @@
 const 
     elastic = require('./../search_module/elastic'),
-    request = require('./charset'),
+    request = require('../modules/charset'),
     Xray = require('x-ray'),
     x = Xray({
       filters: {

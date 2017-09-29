@@ -1,24 +1,10 @@
 const elastic = require('./../search_module/elastic'),
-    request = require('./charset'),
-    entities = require('entities'),
-    options = {
-      method: "GET",            //Set HTTP method
-      jar: true,              //Enable cookies
-      headers: {              //Set headers
-        "User-Agent": "Firefox/48.0"
-      }
-    },
-    makeDriver = require('request-x-ray'),
-    driver = makeDriver(options),    //Create driver
     u = require('url'),
     Xray = require('x-ray'),
     x = Xray({
       filters: {
         whiteSpace: function (value) {
           return typeof value === 'string' ? value.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/ +/g, ' ').replace(/'/g, "''").trim() : value
-        },
-        decode: function (value) {
-          return typeof value === 'string' ? entities.decodeHTML(value) : value
         },
         replaceLineBreak: function (value) { 
           return typeof value === 'string' ? value.replace(/\<br\>/g, ';;') : value
@@ -30,12 +16,13 @@ const elastic = require('./../search_module/elastic'),
           return typeof value === 'string' ? parseInt(value) : value
         }
       }
-    }).driver(request('windows-1251'), driver)
+    });
 
 const START_URL = "http://okay.uz/",
     SHORT_ADDRESS = "okay.uz",
     MAX_PAGES_TO_VISIT = 100000,
     SCOPE = 'body',
+    followLink = ['a[href^="'+ START_URL +'"]:not([href*="/music_download/"]):not([href$=".jpg"]):not([href*="/play/"]):not([href*="/get/"])@href'],
     artistPage = {
       artist: x('.box-mid', {
         artist: 'h2',
@@ -49,7 +36,7 @@ const START_URL = "http://okay.uz/",
           link: 'a.download@href'
         }]),
       }),
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"]):not([href*="/play/"]):not([href*="/get/"])@href']
+      pageLinks: followLink
     },
     albumPage = {
       album: x('.box-mid', {
@@ -63,10 +50,16 @@ const START_URL = "http://okay.uz/",
           link: 'a.download@href'
         }]),
       }),
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"]):not([href*="/play/"]):not([href*="/get/"])@href']
-    }
+      pageLinks: followLink
+    },
+    moviePage = {
+      title: 'table.movie-desc h3',
+      description: 'table.movie-desc | whiteSpace',
+      pageLinks: followLink
+    };
+    
 function condition(obj){
-  if (SELECTOR === albumPage) {return true} else {;
+  if (SELECTOR != artistPage ) {return true} else {;
   return  obj.artist.genre !== undefined};
 };
 
@@ -92,6 +85,8 @@ function crawl() {
         else {
           if (nextPage.includes('/album-')) {
             SELECTOR = albumPage;
+          } else if (nextPage.includes('/serial_more/') || nextPage.includes('/kino_more/')) {
+            SELECTOR = moviePage;
           } else {
             SELECTOR = artistPage;
           }
@@ -134,7 +129,6 @@ function visitPage(url, callback) {
             console.log('___________________________' + pageLinks.splice(i, 1));
           }
           if (i >= pageLinks.length - 1 ){
-            // console.log(obj);
             elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
               elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
                 params : {time : time}

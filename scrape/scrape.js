@@ -1,5 +1,5 @@
 const elastic = require('./../search_module/elastic'),
-    request = require('./charset'),
+    request = require('../modules/charset'),
     entities = require('entities'),
     options = {
       method: "GET",            //Set HTTP method

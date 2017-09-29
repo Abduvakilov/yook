@@ -1,5 +1,5 @@
 const elastic = require('./../search_module/elastic'),
-    // request = require('./charset'),
+    // request = require('../modules/charset'),
     entities = require('entities'),
     u = require('url'),
     moment = require('moment'),
@@ -37,7 +37,7 @@ const START_URL = "https://mover.uz",
       likes: 'table.r-desc td.like@html | parseInt',
       dislikes: 'table.r-desc td.dislike@html | parseInt',
       category: 'p.cat-date a | decode',
-      datePublished: 'p.cat-date@html | afterATag | decode | whiteSpace | date',
+      publishDate: 'p.cat-date@html | afterATag | decode | whiteSpace | date',
       tags: ['p.tags a | decode'],
       pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"])@href']
     };
