@@ -5,13 +5,14 @@ html
     link(rel='stylesheet' href='/stylesheets/style.css')
     //- h1= title
   body
-    form(action='/search' method='get')
-      input(type="text" name="searchTerm" autofill="false" required value=query)
-      button(type="submit") Поиск в Tas-ix
-    hr
+    header
+      form(action='/search' method='get')
+        input(type="text" name="searchTerm" autofill="false" required value=query)
+        button(type="submit") Поиск
+      
     if results
       if total> 0 
-        span !{took/1000} сек. !{total} результатов.
+        span(class='grey') !{took/1000} сек. !{total} результатов.
       else 
         div.noresult
           p По этому запросу в нашем каталоге файлов не найдено.
@@ -27,17 +28,23 @@ html
         for result in results
           div.result
             a(href=result._id)
-              h3= result._source.title
+              if (typeof result._source.title !== 'undefined')
+                h3= result._source.title
             div.link= result._id
-            if result.highlight.description != undefined
-            p !{result.highlight.description}
+            if (typeof result._source.description !== 'undefined')
+              div.desc !{result._source.description}
+            else
+              p 
+
       - startsWith = startsWith + 10
       if startsWith>19
         - var previous = startsWith - 20
         a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+previous)   Предыдущая 
-        span  ⇦ 
+          span  ⇦ 
       if total> 0 
-        span Страница: !{startsWith/10} 
-      if total>startsWith
-        span ⇨ 
-        a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+startsWith)   Следующая
+        span  Страница: !{startsWith/10}  
+      if total>startsWith 
+        a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+startsWith)
+          span  ⇨ Следующая
+
+  footer © 2017

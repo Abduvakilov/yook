@@ -1,5 +1,6 @@
 const elasticsearch = require('elasticsearch'),
     //transl = require('../modules/transl'),
+    result = require('../modules/result'),
     client = elasticsearch.Client({
       host: '127.0.0.1:9200',
       log: 'error'
@@ -15,7 +16,7 @@ module.exports = function(searchTerm, from, callback) {
       query: {
         multi_match: {
           query: searchTerm,
-          fields: ['title^3', 'description'],
+          fields: ['title^4', 'description', 'category', '*.tags^2', '*.artist^3', '*.name', '*.genre'],
           fuzziness: 1
         }
       },
@@ -23,17 +24,18 @@ module.exports = function(searchTerm, from, callback) {
       from: from,
       highlight : {
         fields : {
-          description : {}
+          description : {},
+          "*.name": {},
+          "*.genre": {}
         },
         pre_tags: '<b>',
         post_tags: '</b>'
       }
     }
-  }, function (err, resp) {
-      if(err){
-        console.error(err);
-      } else {
-        callback(resp);
-      }
-  });
-};
+  }, function (error, response) {
+          if (error) console.error(error);
+          console.log(response.hits.hits)
+          result(response.hits.hits, from)
+          callback(error, response);
+    })
+}

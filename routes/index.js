@@ -15,8 +15,12 @@ router.get('/search', function(req, res) {
 		from = parseInt(req.query.startsWith);
 	}
 	if (searchTerm !== '') {
-		search(searchTerm, from, function(data) {
-			res.render('index', { title: 'Поиск в Tas-ix',  query: searchTerm, took:data.took, total: data.hits.total, results: data.hits.hits, startsWith: from});
+		search(searchTerm, from, function(error, response) {
+			if (error) {
+				res.render('error', {message: 'Ошибка', error:{status: '', stack:''}})
+			} else {
+				res.render('index', { title: 'Поиск в Tas-ix',  query: searchTerm, took:response.took, total: response.hits.total, results: response.hits.hits, startsWith: from});
+	  		}
 	  	});
 	} else res.render('index', { title: 'Поиск в Tas-ix' });
 });

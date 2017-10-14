@@ -22,10 +22,10 @@ const START_URL = "http://okay.uz/",
     SHORT_ADDRESS = "okay.uz",
     MAX_PAGES_TO_VISIT = 100000,
     SCOPE = 'body',
-    followLink = ['a[href^="'+ START_URL +'"]:not([href*="/music_download/"]):not([href$=".jpg"]):not([href*="/play/"]):not([href*="/get/"])@href'],
+    followLink = ['a[href^="'+ START_URL +'"]:not([href*="_download/"]):not([href$=".jpg"]):not([href*="play/"]):not([href*="/get/"])@href'],
     artistPage = {
       artist: x('.box-mid', {
-        artist: 'h2',
+        artist: 'h2', //artist
         genre: 'a.color1',
         clips: x('.clip-box', [{
           name: 'a.clip-name',
@@ -40,13 +40,13 @@ const START_URL = "http://okay.uz/",
     },
     albumPage = {
       album: x('.box-mid', {
-        name : 'tr:first-child td:nth-child(2)',
+        title : 'tr:first-child td:nth-child(2)',
         artist: 'tr:nth-child(2) td:nth-child(2)',
         genre: 'tr:nth-child(3) td:nth-child(2)',
         year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
         link: 'tr:nth-child(6) td:nth-child(2) a@href',
         songs: x('.block tr', [{
-          name: 'span',
+          title: 'span',
           link: 'a.download@href'
         }]),
       }),

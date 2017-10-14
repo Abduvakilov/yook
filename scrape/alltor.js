@@ -38,7 +38,7 @@ const START_URL = "https://alltor.me",
       category: ['#main_content table:first-of-type .nav.w100 a:not(:first-child)'],
       publishDate: 'div.post_head | whiteSpace | date:true',
       //editDate: '.last_edited | getBraces | whiteSpace | date',
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href^="magnet:?"]):not([href$=".jpg"]):not([href*="&view="])@href']
+      pageLinks: ['a[href^="'+ START_URL +'"]:not([href^="https://alltor.me/download.php""]):not([href^="magnet:?"]):not([href$=".jpg"]):not([href*="&view="])@href']
     },
     MAX_PAGES_TO_VISIT = 100000;
 function condition (obj){

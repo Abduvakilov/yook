@@ -8,10 +8,10 @@ const elasticsearch = require('elasticsearch'),
     https = require('https'),
     date = require('../modules/date')
 
-var n = 0;
 
 module.exports = {
 	date: date,
+	nextPages: [],
 	update: function(type, id, body, callback){
 		client.update({
 		    index: "crawl", 
@@ -20,7 +20,7 @@ module.exports = {
 		    body: body 
 	  }, function(error, response) {
 		    if (error) {
-		      console.error(error);
+		      // console.error(error);
 		      // return;
 		    }
 		    else {
@@ -66,33 +66,38 @@ module.exports = {
 		  }
 		}, function (error, response) {
 		    if (error) {
-		      // console.error(error);
+		      console.error(error);
 		      // return;
 		    } else callback(response.hits.hits[0] !== undefined)
 		})
 	},
 
 	nextPage: function(site, callback){
-		client.search({
-		    index: "crawl", 
-		    type: "crawled",
-		    body: {
-					size : 7,
-					query: {
-						bool: {
-							must: {match: {crawled: site}}
+		if (module.exports.nextPages.length != 0) {
+			// console.log()
+			callback(module.exports.nextPages.splice(0, 1)[0]._id);
+		} else {
+			client.search({
+			    index: "crawl", 
+			    type: "crawled",
+			    body: {
+						size : 100,
+						query: {
+							bool: {
+								must: {match: {crawled: site}}
+							}
 						}
 					}
-				}
-	  	}, function (error, response) {
-			if (error) {
-		      console.error(error);
-		      // return;
-		  	} else if (response.hits.total !== 0) {
-				callback(response.hits.hits[n]._id);
-				if (n<6 && n<response.hits.total-2) n++; else n=0;
-			} else (console.log('no nextPage'));
-		})
+		  	}, function (error, response) {
+				if (error) {
+			      console.error(error);
+			      // return;
+			  	} else if (response.hits.total !== 0) {
+					module.exports.nextPages = response.hits.hits;
+					callback(module.exports.nextPages.splice(0, 1)[0]._id);
+				} else (console.log('no nextPage'));
+			})
+		}
 	},
 	linksToVisit: function(array, short_address, callback, reindex){
       let i = 0;
@@ -118,6 +123,7 @@ module.exports = {
 		    path: u.parse(url).path
 		};
 		req.get(options, function (res) {
+			// console.log('status code: '+res.statusCode)
   			if (res.statusCode<299) {
   				if (res.headers['content-type'].toUpperCase().includes('HTML')) {
   					sucsessCallback()

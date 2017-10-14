@@ -15,6 +15,9 @@ const elastic = require('./../search_module/elastic'),
         replaceLineBreak: function (value) { 
           return typeof value === 'string' ? value.replace(/\<br\>/g, ';;') : value
         },
+        removeSpoiler: function (value) {
+          return typeof value === 'string' ? value.replace('свернуть развернуть', '') : value
+        },
         afterATag: function (value){
           return typeof value === 'string' ? value.split('</a>')[1] : value
         },
@@ -32,7 +35,7 @@ const START_URL = "https://mover.uz",
     MAX_PAGES_TO_VISIT = 100000,
     SCRAPE_OBJECT = {  
       title: '.fl.video-title | whiteSpace | decode',
-      description: ['div.desc p:not(.cat-date):not(.tags)| decode | whiteSpace'],
+      description: 'div.desc-text | decode | whiteSpace | removeSpoiler',
       views: 'span.fr.views | parseInt',
       likes: 'table.r-desc td.like@html | parseInt',
       dislikes: 'table.r-desc td.dislike@html | parseInt',
