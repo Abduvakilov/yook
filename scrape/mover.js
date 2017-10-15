@@ -93,6 +93,7 @@ function visitPage(url, callback) {
         console.log('condition achieved at page ' + url);
         console.log(obj);
         obj.crawledDate = time;
+        obj.site = SHORT_ADDRESS;
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, final )       
         );
