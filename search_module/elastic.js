@@ -1,6 +1,6 @@
 const elasticsearch = require('elasticsearch'),
     client = elasticsearch.Client({
-      host: '127.0.0.1:9200',
+      host: 'localhost:9200',
       log: 'error'
     }),
     u = require('url'),
@@ -20,15 +20,16 @@ module.exports = {
 		    body: body 
 	  }, function(error, response) {
 		    if (error) {
-		      // console.error(error);
+		      console.error(error);
 		      // return;
 		    }
 		    else {
-		    // console.log(response);
+		    	if (callback) {
+			 		callback();
+				}
+		    	// console.log(response);
 		    }
-		    if (callback) {
-			    callback();
-			}
+		    
 	  })
 	},
 
@@ -74,7 +75,7 @@ module.exports = {
 
 	nextPage: function(site, callback){
 		if (module.exports.nextPages.length != 0) {
-			// console.log()
+			// console.log('There is an array of pages waiting')
 			callback(module.exports.nextPages.splice(0, 1)[0]._id);
 		} else {
 			client.search({
@@ -100,19 +101,45 @@ module.exports = {
 		}
 	},
 	linksToVisit: function(array, short_address, callback, reindex){
-      let i = 0;
-      inner();
-      function inner(){
-         if (array[i]){
-         	if (reindex) {
-         		module.exports.update('crawled', array[i], {doc:{crawled: short_address}, doc_as_upsert : true});
-         	} else module.exports.create('crawled', array[i], {crawled: short_address});
-        	i++;
-        	inner();
-         } else {
-           callback();
-         }
-      }
+		let i = 0,
+			bulk = [];
+		inner();
+		function inner(){
+			if (array[i]){
+		 		if (reindex) {
+		 			bulk.push({update: {_id: array[i]}});
+					bulk.push({doc:{crawled: short_address}, doc_as_upsert : true});
+			 	} else {
+			 		bulk.push({index:{_id: array[i]}});
+					bulk.push({crawled: short_address});
+			 	};
+				i++;
+				inner();
+			} else {
+				client.bulk({index:'crawl',type:'crawled',body:bulk}, function(err,resp){
+					if (err) console.error(err)
+					else callback();
+				})
+			}
+		}
+ 	//     	client.bulk({
+	// 		body: [
+	// 		// action description
+	// 		{ index:  { _index: 'myindex', _type: 'mytype', _id: 1 } },
+	// 		 // the document to index
+	// 		{ title: 'foo' },
+	// 		// action description
+	// 		{ update: { _index: 'myindex', _type: 'mytype', _id: 2 } },
+	// 		// the document to update
+	// 		{ doc: { title: 'foo' } },
+	// 		// action description
+	// 		{ delete: { _index: 'myindex', _type: 'mytype', _id: 3 } },
+	// 		// no document needed for this delete
+	// 		]
+	// 	}, function (err, resp) {
+	// 		// ...
+	// });
+
     },
 
 	checkUrl: function(url, failCallback, sucsessCallback, anyStatus){

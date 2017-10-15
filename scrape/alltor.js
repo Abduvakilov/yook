@@ -38,7 +38,7 @@ const START_URL = "https://alltor.me",
       category: ['#main_content table:first-of-type .nav.w100 a:not(:first-child)'],
       publishDate: 'div.post_head | whiteSpace | date:true',
       //editDate: '.last_edited | getBraces | whiteSpace | date',
-      pageLinks: ['a[href^="'+ START_URL +'"]:not([href^="https://alltor.me/download.php""]):not([href^="magnet:?"]):not([href$=".jpg"]):not([href*="&view="])@href']
+      pageLinks: ['a[href^="'+ START_URL +'"]:not([href^="https://alltor.me/download.php""]):not([href^="magnet:?"]):not([href$=".jpg"]):not([href*="&view="]):not([href*="#"])@href']
     },
     MAX_PAGES_TO_VISIT = 100000;
 function condition (obj){
@@ -88,13 +88,13 @@ function visitPage(url, callback) {
 
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
-        console.log(obj)
         obj.crawledDate = time;
+        obj.site = SHORT_ADDRESS;        
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, callback )       
         );
       } else final()
-      
+
       function final(){
         for (i = 0; i < pageLinks.length; i++) {
           if (!u.parse(pageLinks[i]).hostname.includes(SHORT_ADDRESS)){
@@ -104,9 +104,22 @@ function visitPage(url, callback) {
             elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
               elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
                 params : {time : time}
-              }}, callback)
+              }}, function(err, res) {
+                if (err) {
+                  console.error(error);
+                  // return;
+                } else callback();
+              });
             })
           }
+        }
+        if ( 0 == pageLinks.length){
+          console.log('no links at ' + url);
+          elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
+            elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+              params : {time : time}
+            }}, callback);
+          })
         }
       }
     }
