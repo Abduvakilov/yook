@@ -42,7 +42,7 @@ const START_URL = "https://mover.uz",
       category: 'p.cat-date a | decode',
       publishDate: 'p.cat-date@html | afterATag | decode | whiteSpace | date',
       tags: ['p.tags a | decode'],
-      pageLinks: ['a[href*="'+ SHORT_ADDRESS +'"]:not([href$=".jpg"])@href']
+      pageLinks: ['a[href^="'+ START_URL +'"]:not([href$=".jpg"]):not([href*="#"])@href']
     };
 function condition (obj){
   return  !isNaN(obj.views);
