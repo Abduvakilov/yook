@@ -6,11 +6,13 @@ const elasticsearch = require('elasticsearch'),
     u = require('url'),
     http = require('http'),
     https = require('https'),
-    date = require('../modules/date')
+    date = require('../modules/date'),
+    moment = require('moment');
 
 
 module.exports = {
 	date: date,
+	moment: moment,
 	nextPages: [],
 	update: function(type, id, body, callback){
 		client.update({

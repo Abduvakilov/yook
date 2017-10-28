@@ -24,7 +24,7 @@ const elastic = require('./../search_module/elastic'),
         //   return typeof value === 'string' ? value.match(/\(([^)]+)\)/)[1] : value
         // },
         date: function (value, isDayFirst) {
-          return typeof value === 'string' ? elastic.date(value, isDayFirst) : value          
+          return typeof value === 'string' ? elastic.moment(value, isDayFirst) : value          
         }
       }
     })
@@ -89,7 +89,7 @@ function visitPage(url, callback) {
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
         obj.crawledDate = time;
-        obj.site = SHORT_ADDRESS;        
+        obj.site = SHORT_ADDRESS;
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : "ctx._source.remove('crawled')", upsert: {crawledDate: time }}, callback )       
         );

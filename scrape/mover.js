@@ -2,7 +2,6 @@ const elastic = require('./../search_module/elastic'),
     // request = require('../modules/charset'),
     entities = require('entities'),
     u = require('url'),
-    moment = require('moment'),
     Xray = require('x-ray'),
     x = Xray({
       filters: {
@@ -25,7 +24,7 @@ const elastic = require('./../search_module/elastic'),
           return typeof value === 'string' ? parseInt(value) : value
         },
         date: function (value) {
-          return typeof value === 'string' ? moment(value, 'DD MMMM YYYY', 'ru').format() : value
+          return typeof value === 'string' ? elastic.moment(value, 'DD MMMM YYYY', 'ru').toISOString() : value
         }
       }
     });

@@ -15,18 +15,22 @@ module.exports = function(sq, from, callback) {
     body: {
       query: {
         function_score: {
-          functions: [{
-            gauss: {
-              crawledDate: {scale: '40d'}
-            }
-          }],
-          query: {
-            multi_match: {
-              query: sq,
-              fields: ['title^4', 'description', 'category', '*.tags^2', '*.artist^3', '*.name', '*.genre'],
-              fuzziness: 1
-            }
-          }
+          multi_match: {
+            query: sq,
+            params: {
+              now: new Date()
+            },
+            filters:{
+              filter: {
+                exists: {
+                  field: 'publishDate'
+                }
+              },
+              script: '(0.08 / ((3.16*pow(10,-11)) * abs(now - doc["publishDate"].date.getMillis()) + 0.05)) + 1.0'
+            },
+            fields: ['title^4', 'description', 'category', '*.tags^2', '*.artist^3', '*.name', '*.genre'],
+            fuzziness: 1
+          },
         }
       },
       size: 10,
@@ -43,10 +47,7 @@ module.exports = function(sq, from, callback) {
     }
   }, function (error, response) {
           if (error) console.error(error);
-          console.log(response.hits)
-          if (response.hits) {
-            result(response.hits.hits, from);
-          }
+          result(response.hits.hits, from)
           callback(error, response);
     })
 }

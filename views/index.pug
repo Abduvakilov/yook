@@ -7,7 +7,7 @@ html
   body
     header
       form(action='/search' method='get')
-        input(type="text" name="searchTerm" autofill="false" required value=query)
+        input(type="text" name="search" autofill="false" required value=query)
         button(type="submit") Поиск
       
     if results
@@ -33,18 +33,17 @@ html
             div.link= result._id
             if (typeof result._source.description !== 'undefined')
               div.desc !{result._source.description}
-            else
-              p 
 
       - startsWith = startsWith + 10
-      if startsWith>19
-        - var previous = startsWith - 20
-        a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+previous)   Предыдущая 
-          span  ⇦ 
+      div.prev
+        if startsWith>19
+          - var previous = startsWith - 20
+          a(href='search?search='+encodeURIComponent(query)+'&startsWith='+previous)   Предыдущая 
+            span  ⇦ 
       if total> 0 
-        span  Страница: !{startsWith/10}  
+        span  Страница: !{startsWith/10} 
       if total>startsWith 
-        a(href='search?searchTerm='+encodeURIComponent(query)+'&startsWith='+startsWith)
+        a(href='search?search='+encodeURIComponent(query)+'&startsWith='+startsWith)
           span  ⇨ Следующая
 
   footer © 2017
