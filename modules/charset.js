@@ -14,6 +14,7 @@ function driver(enc, opts) {
       .get(ctx.url)
       .charset(enc)
       .set(ctx.headers)
+      .timeout(5000)
       .end(function(err, res) {
         if (err && !err.status) return fn(err)
 

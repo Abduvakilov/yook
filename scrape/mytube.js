@@ -1,14 +1,5 @@
 const elastic = require('./../search_module/elastic'),
     request = require('../modules/charset'),
-    options = {
-      method: "GET",            //Set HTTP method
-      jar: true,              //Enable cookies
-      headers: {              //Set headers
-        'user-agent': 'Mozilla/5.0'
-      }
-    },
-    makeDriver = require('request-x-ray'),
-    driver = makeDriver(options),    //Create driver
     u = require('url'),
     Xray = require('x-ray'),
     x = Xray({
@@ -23,11 +14,11 @@ const elastic = require('./../search_module/elastic'),
           return typeof value === 'string' ? elastic.moment(value, 'DD MMMM YYYY', 'ru').toISOString() : value
         }
       }
-    }).driver(driver);
+    }).driver(request(null, {headers: {'user-agent': 'yook'}}));
 
 const START_URL = "http://mytube.uz/",
     SHORT_ADDRESS = "mytube.uz",
-    MAX_PAGES_TO_VISIT = 1000000,
+    MAX_PAGES_TO_VISIT = 800,
     SELECTOR = {  
       title: 'h2',
       description:'#aboutUser pre | whiteSpace',
@@ -103,15 +94,13 @@ function visitPage(url, callback) {
               pageLinks.splice(i, 1)
             // );
           }
-          if (i >= pageLinks.length - 1 ){
-            // console.log(obj);
-            elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
-              elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
-              }}, callback)
-            })
-          }
         }
+        // console.log(obj);
+        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
+          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            params : {time : time}
+          }}, callback)
+        })
       }
     }
   });

@@ -40,7 +40,7 @@ const START_URL = "https://alltor.me",
       //editDate: '.last_edited | getBraces | whiteSpace | date',
       pageLinks: ['a[href^="'+ START_URL +'"]:not([href^="https://alltor.me/download.php""]):not([href^="magnet:?"]):not([href$=".jpg"]):not([href*="&view="]):not([href*="#"])@href']
     },
-    MAX_PAGES_TO_VISIT = 100000;
+    MAX_PAGES_TO_VISIT = 450;
 function condition (obj){
   return  obj.description !== undefined && obj.description !== null
 };
@@ -100,27 +100,17 @@ function visitPage(url, callback) {
           if (!u.parse(pageLinks[i]).hostname.includes(SHORT_ADDRESS)){
             console.log('___________________________' + pageLinks.splice(i, 1));
           }
-          if (i >= pageLinks.length - 1 ){
-            elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
-              elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
-              }}, function(err, res) {
-                if (err) {
-                  console.error(error);
-                  // return;
-                } else callback();
-              });
-            })
-          }
         }
-        if ( 0 == pageLinks.length){
-          console.log('no links at ' + url);
-          elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
-            elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-              params : {time : time}
-            }}, callback);
-          })
-        }
+        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
+          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            params : {time : time}
+          }}, function(err, res) {
+            if (err) {
+              console.error(error);
+              // return;
+            } else callback();
+          });
+        })
       }
     }
   });

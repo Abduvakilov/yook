@@ -1,5 +1,5 @@
 var req = require('http');
-var url = 'http://mytube.uz/uz/tracks/channels/33738.htm';
+var url = 'http://niagara.uz/';
 var u = require('url')
 var options = 
 {
@@ -8,8 +8,11 @@ var options =
     headers: {'user-agent': 'Mozilla/5.0'},
     path: u.parse(url).path
 };
+let n = 0
+for (let i=0;i<1000;i++){
 req.get(options, function (res) {
-  console.log(res.statusCode)
+    n++
+    console.log('the status code of connection' + n + res.statusCode)
         // if (res.statusCode<299) {
         //   if (res.headers['content-type'].toUpperCase().includes('HTML')) {
         //     sucsessCallback()
@@ -22,3 +25,5 @@ req.get(options, function (res) {
         // module.exports.update("crawled", url, {doc:{crawled: 'code>299'}, doc_as_upsert : true}, failCallback());
         // }
     });
+    console.log(i);
+}   

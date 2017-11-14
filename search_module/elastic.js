@@ -20,18 +20,14 @@ module.exports = {
 		    type: type, 
 		    id: id, 
 		    body: body 
-	  }, function(error, response) {
+	  	}, function(error, response) {
 		    if (error) {
 		      console.error(error);
 		      // return;
 		    }
-		    else {
-		    	if (callback) {
-			 		callback();
-				}
-		    	// console.log(response);
-		    }
-		    
+	    	if (callback) {
+		 		callback();
+			};		    
 	  })
 	},
 
@@ -105,7 +101,8 @@ module.exports = {
 	linksToVisit: function(array, short_address, callback, reindex){
 		let i = 0,
 			bulk = [];
-		inner();
+		array.length > 0 ? inner() : callback();
+		
 		function inner(){
 			if (array[i]){
 		 		if (reindex) {

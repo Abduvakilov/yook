@@ -22,18 +22,17 @@ const START_URL = "http://okay.uz/",
     SHORT_ADDRESS = "okay.uz",
     MAX_PAGES_TO_VISIT = 100000,
     SCOPE = 'body',
-    followLink = ['a[href^="'+ START_URL +'"]:not([href*="_download/"]):not([href$=".jpg"]):not([href*="play/"]):not([href*="/get/"])@href'],
+    followLink = ['a[href^="'+ START_URL +'"]:not([href*="#"]):not([href$=".jpg"]):not([href^="http://okay.uz/uz/"])@href'],
     artistPage = {
-      artist: x('.box-mid', {
-        artist: 'h2', //artist
-        genre: 'a.color1',
-        clips: x('.clip-box', [{
-          name: 'a.clip-name',
-          link: 'a.clip-name@href'
+      artist: x('.right', {
+        artist: 'h3.title', //artist genre and numbers     ---------QAYTA KO‘RISHGA
+        clips: x('.clips li', [{
+          name: 'p a',
+          link: 'p a@href'
         }]),
-        singles: x('.block tr', [{
-          name: 'span',
-          link: 'a.download@href'
+        singles: x('ul.audio li', [{
+          name: 'p a',
+          link: 'a:nth-child(2)@href'
         }]),
       }),
       pageLinks: followLink
@@ -43,7 +42,7 @@ const START_URL = "http://okay.uz/",
         title : 'tr:first-child td:nth-child(2)',
         artist: 'tr:nth-child(2) td:nth-child(2)',
         genre: 'tr:nth-child(3) td:nth-child(2)',
-        year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
+        year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',  //---------QAYTA KO‘RISHGA
         link: 'tr:nth-child(6) td:nth-child(2) a@href',
         songs: x('.block tr', [{
           title: 'span',
@@ -53,14 +52,16 @@ const START_URL = "http://okay.uz/",
       pageLinks: followLink
     },
     moviePage = {
-      title: 'table.movie-desc h3',
-      description: 'table.movie-desc | whiteSpace',
+      title: 'div.info h3',
+      subTitle: 'div.info h6',
+      year: 'div.info a[href*="?FilterForm[year]"]',
+      genre: ['.col-md-9 div.info a[href*="?FilterForm[genre_id]"]'],   //------Vrode tayyor
+      description: 'div.info div.description-more@data-more',
       pageLinks: followLink
     };
     
 function condition(obj){
-  if (SELECTOR != artistPage ) {return true} else {;
-  return  obj.artist.genre !== undefined};
+  return  ((obj.artist.genre !== undefined) || (SELECTOR != artistPage ));
 };
 
 let SELECTOR = {},
@@ -83,9 +84,9 @@ function crawl() {
         }
         // New page we haven't visited
         else {
-          if (nextPage.includes('/album-')) {
-            SELECTOR = albumPage;
-          } else if (nextPage.includes('/serial_more/') || nextPage.includes('/kino_more/')) {
+          if (nextPage.includes('/music_albom/')) {
+            SELECTOR = artistPage;
+          } else if (nextPage.includes('/videoclub/')) {
             SELECTOR = moviePage;
           } else {
             SELECTOR = artistPage;

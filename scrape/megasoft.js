@@ -18,7 +18,7 @@ const
 
 const START_URL = "http://megasoft.uz/",
     SHORT_ADDRESS = "megasoft.uz",
-    MAX_PAGES_TO_VISIT = 1000000,
+    MAX_PAGES_TO_VISIT = 2200,
     reindex = false;
 
 let numPagesVisited = 0,

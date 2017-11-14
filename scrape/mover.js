@@ -1,5 +1,5 @@
 const elastic = require('./../search_module/elastic'),
-    // request = require('../modules/charset'),
+    request = require('../modules/charset'),
     entities = require('entities'),
     u = require('url'),
     Xray = require('x-ray'),
@@ -10,9 +10,6 @@ const elastic = require('./../search_module/elastic'),
         },
         decode: function (value) {
           return typeof value === 'string' ? entities.decodeHTML(value) : value
-        },
-        replaceLineBreak: function (value) { 
-          return typeof value === 'string' ? value.replace(/\<br\>/g, ';;') : value
         },
         removeSpoiler: function (value) {
           return typeof value === 'string' ? value.replace('свернуть развернуть', '') : value
@@ -27,11 +24,11 @@ const elastic = require('./../search_module/elastic'),
           return typeof value === 'string' ? elastic.moment(value, 'DD MMMM YYYY', 'ru').toISOString() : value
         }
       }
-    });
+    }).driver(request(null, {headers: {'user-agent': 'yook'}}));
 
 const START_URL = "https://mover.uz",
     SHORT_ADDRESS = "mover.uz",
-    MAX_PAGES_TO_VISIT = 100000,
+    MAX_PAGES_TO_VISIT = 350,
     SCRAPE_OBJECT = {  
       title: '.fl.video-title | whiteSpace | decode',
       description: 'div.desc-text | decode | whiteSpace | removeSpoiler',
@@ -103,14 +100,12 @@ function visitPage(url, callback) {
           if (!u.parse(pageLinks[i]).hostname.includes(SHORT_ADDRESS)){
             console.log('___________________________' + pageLinks.splice(i, 1));
           }
-          if (i >= pageLinks.length - 1 ){
-            elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
-              elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
-              }}, callback)
-            })
-          }
         }
+        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
+          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            params : {time : time}
+          }}, callback)
+        })
       }
     }
   });
