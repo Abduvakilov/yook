@@ -51,7 +51,6 @@ function x(enc, phant) {
       }
     }).driver(phant ? phantom(phantomOptions) : driver(enc, options))
 }
-
 function driver(enc, opts) {
   var agent = superagent.agent(opts || {})
 
