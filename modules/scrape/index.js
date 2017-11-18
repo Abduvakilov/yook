@@ -1,8 +1,8 @@
 module.exports = start;
-function start(START_URL,ENCODING,TARGET,SELECTOR,MAX_PAGES_TO_VISIT){
-const elastic = require('../../search_module/elastic'),
+function start(START_URL,TARGET,SELECTOR,ENCODING,MAX_PAGES_TO_VISIT,URL_SHOULD_NOT_CONTAIN){
+let elastic = require('../../search_module/elastic'),
   x = require('./xray')(ENCODING),
-  SHORT_ADDRESS = (START_URL),
+  SHORT_ADDRESS = require('url').parse(START_URL).hostname,
   SCOPE = 'body';
 let numPagesVisited = 0,
     url = START_URL;
@@ -57,7 +57,7 @@ function visitPage(url, callback) {
       } else final();
       
       function final(){
-        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
+        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, URL_SHOULD_NOT_CONTAIN, function(){
           elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
             params : {time : time}
           }}, callback);

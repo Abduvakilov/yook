@@ -98,20 +98,22 @@ module.exports = {
 			})
 		}
 	},
-	linksToVisit: function(array, short_address, callback, reindex){
+	linksToVisit: function(array, short_address, reindex, urlNotLike, callback){  // url not like URL_SHOULD_NOT_CONTAIN
 		let i = 0,
 			bulk = [];
 		array.length > 0 ? inner() : callback();
 		
 		function inner(){
 			if (array[i]){
-		 		if (reindex) {
-		 			bulk.push({update: {_id: array[i]}});
-					bulk.push({doc:{crawled: short_address}, doc_as_upsert : true});
-			 	} else {
-			 		bulk.push({index:{_id: array[i]}});
-					bulk.push({crawled: short_address});
-			 	};
+				if(urlNotLike !== undefined ? !urlNotLike.some(function(element){return array[i].indexOf(element) >= 0}) : true) {
+			 		if (reindex && u.parse(array[i]).hostname === short_address && array[i].startsWith('http')) {
+			 			bulk.push({update: {_id: array[i]}});
+						bulk.push({doc:{crawled: short_address}, doc_as_upsert : true});
+				 	} else if (u.parse(array[i]).hostname === short_address && array[i].startsWith('http')) {
+				 		bulk.push({index:{_id: array[i]}});
+						bulk.push({crawled: short_address});
+				 	};
+				}
 				i++;
 				inner();
 			} else {
@@ -145,7 +147,7 @@ module.exports = {
 		if (url.startsWith('https')) {req = https} else {req = http};
 		let options = {
 		    host: u.parse(url).hostname,
-		    headers: {'user-agent': 'Mozilla/5.0'},
+		    headers: {'user-agent': 'yook'},
 		    path: u.parse(url).path
 		};
 		req.get(options, function (res) {
