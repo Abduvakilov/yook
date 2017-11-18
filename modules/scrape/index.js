@@ -1,7 +1,9 @@
 module.exports = start;
-function start(START_URL,SHORT_ADDRESS,SCOPE,ENCODING,TARGET,SELECTOR,MAX_PAGES_TO_VISIT){
+function start(START_URL,ENCODING,TARGET,SELECTOR,MAX_PAGES_TO_VISIT){
 const elastic = require('../../search_module/elastic'),
-	x = require('./xray')(ENCODING);
+  x = require('./xray')(ENCODING),
+  SHORT_ADDRESS = (START_URL),
+  SCOPE = 'body';
 let numPagesVisited = 0,
     url = START_URL;
 
@@ -43,7 +45,7 @@ function visitPage(url, callback) {
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks
       if (obj[TARGET]) {
-        console.log('condition achieved at page ' + url);
+        console.log('target exists at page ' + url);
         obj.crawledDate = time;
         console.log(obj)
 

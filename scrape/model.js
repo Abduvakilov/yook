@@ -1,6 +1,4 @@
 const START_URL = "http://player.uz/",
-    SHORT_ADDRESS = "player.uz",
-    SCOPE = 'body',
     ENCODING = 'windows-1251',
     TARGET = 'title'
     SELECTOR = {
@@ -21,4 +19,4 @@ const START_URL = "http://player.uz/",
 
 var start = require('../modules/scrape');
 
-start(START_URL, SHORT_ADDRESS, SCOPE,ENCODING,TARGET,SELECTOR,MAX_PAGES_TO_VISIT);
+start(START_URL,ENCODING,TARGET,SELECTOR,MAX_PAGES_TO_VISIT);
