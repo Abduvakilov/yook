@@ -1,22 +1,22 @@
-const START_URL = "http://player.uz/",
+const START_URL = "https://allmovies.uz/",
     TARGET = 'title'
     SELECTOR = {
       title: 'div#desc h1.title',
       subTitle: 'div#desc h2.title_orig',
       img: 'div#desc div.pic img@src',
-      year: 'div.description div.clear :nth-child(2) | parseFloat',
-      country: 'div.description div.clear :nth-child(4)',
-      genre: ['div.description div.clear :nth-child(6) a'],
-      forAge: 'div.description div.clear :nth-child(8)',
-      rating: 'div.description #average | parseFloat',
-      rateCount: 'div.description #rate-count',
-      imdb: 'p.imdb-value | parseFloat',
-      kinopoisk: 'p.kinopoisk-value | parseFloat',
-      description: 'div.description .story p',
-      pageLinks: ['a[href^="'+ START_URL +'"]:not([href$=".jpg"]):not([href*="#"]):not([href*="?season="]):not([href*="?cpage="]):not([href*="?stuffers"])@href']
+      year: 'div#desc div.year | parseFloat',
+      country: 'div#desc div.countries',
+      genre: ['div#desc div.genres a'],
+      directors: ['table.details tr:contains("Режиссер") td a'],
+      budget: 'table.details tr:contains("Бюджет") td',
+      producers: ['table.details tr:contains("Продюсеры") td a'],
+      actors: ['table.details tr:contains("В ролях") td a'],
+      forAge: 'div#desc div.age',
+      imdb: 'div.ratings > div.rating:contains("IMDb") div.rate | parseFloat',
+      kinopoisk: 'div.ratings > div.rating:contains("Кинопоиск") div.rate | parseFloat',
+      description: 'div#desc div.desc',
+      pageLinks: ['a[href^="'+ START_URL +'"]:not([href$=".jpg"]):not([href*="#"]):not([href*="/search?"]):not([href*="sort="])@href']
     },
-    MAX_PAGES_TO_VISIT = process.env.max ? process.env.max : 200,
     ENCODING = 'utf-8',
-    // URL_SHOULD_NOT_CONTAIN = null;
 
-require('../modules/scrape')(START_URL,TARGET,SELECTOR,ENCODING,MAX_PAGES_TO_VISIT,URL_SHOULD_NOT_CONTAIN);
+require('../modules/scrape')(START_URL,TARGET,SELECTOR,ENCODING);

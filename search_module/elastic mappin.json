@@ -1,311 +1,5 @@
+curl -XPUT 'localhost:9200/crawl?pretty' -H 'Content-Type: application/json' -d'
 {
-  "test" : {
-    "mappings" : { }
-  },
-  "library" : {
-    "mappings" : {
-      "article" : {
-        "properties" : {
-          "abstract" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "authors" : {
-            "properties" : {
-              "email" : {
-                "type" : "text",
-                "fields" : {
-                  "keyword" : {
-                    "type" : "keyword",
-                    "ignore_above" : 256
-                  }
-                }
-              },
-              "firstname" : {
-                "type" : "text",
-                "fields" : {
-                  "keyword" : {
-                    "type" : "keyword",
-                    "ignore_above" : 256
-                  }
-                }
-              },
-              "institution" : {
-                "type" : "text",
-                "fields" : {
-                  "keyword" : {
-                    "type" : "keyword",
-                    "ignore_above" : 256
-                  }
-                }
-              },
-              "lastname" : {
-                "type" : "text",
-                "fields" : {
-                  "keyword" : {
-                    "type" : "keyword",
-                    "ignore_above" : 256
-                  }
-                }
-              }
-            }
-          },
-          "body" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "id" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "journal" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "keywords" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "link" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "number" : {
-            "type" : "long"
-          },
-          "pages" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "title" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "volume" : {
-            "type" : "long"
-          },
-          "year" : {
-            "type" : "long"
-          }
-        }
-      }
-    }
-  },
-  "twitter" : {
-    "mappings" : { }
-  },
-  "index" : {
-    "mappings" : {
-      "type" : {
-        "properties" : {
-          "body" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "epubs" : {
-    "mappings" : {
-      "form" : {
-        "properties" : {
-          "description" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "link" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "title" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          }
-        }
-      },
-      "forms" : {
-        "properties" : {
-          "query" : {
-            "properties" : {
-              "bool" : {
-                "properties" : {
-                  "must" : {
-                    "properties" : {
-                      "match" : {
-                        "properties" : {
-                          "title" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "pub" : {
-        "properties" : {
-          "link" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          },
-          "title" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  ".kibana" : {
-    "mappings" : {
-      "config" : {
-        "properties" : {
-          "buildNum" : {
-            "type" : "keyword"
-          },
-          "dateFormat:dow" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
-          }
-        }
-      },
-      "server" : {
-        "properties" : {
-          "uuid" : {
-            "type" : "keyword"
-          }
-        }
-      },
-      "timelion-sheet" : {
-        "properties" : {
-          "description" : {
-            "type" : "text"
-          },
-          "hits" : {
-            "type" : "integer"
-          },
-          "kibanaSavedObjectMeta" : {
-            "properties" : {
-              "searchSourceJSON" : {
-                "type" : "text"
-              }
-            }
-          },
-          "timelion_chart_height" : {
-            "type" : "integer"
-          },
-          "timelion_columns" : {
-            "type" : "integer"
-          },
-          "timelion_interval" : {
-            "type" : "text"
-          },
-          "timelion_other_interval" : {
-            "type" : "text"
-          },
-          "timelion_rows" : {
-            "type" : "integer"
-          },
-          "timelion_sheet" : {
-            "type" : "text"
-          },
-          "title" : {
-            "type" : "text"
-          },
-          "version" : {
-            "type" : "integer"
-          }
-        }
-      }
-    }
-  },
-  "crawl" : {
     "mappings" : {
       "targets" : {
         "properties" : {
@@ -468,23 +162,19 @@
             }
           },
           "crawledDate" : {
-            "type" : "date"
+            "type" : "date",
+            "format": "dd.MM.yy"
           },
           "datePublished" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
+            "type" : "date",
+            "format": "dd.MM.yy"
           },
           "description" : {
             "type" : "text",
             "fields" : {
               "keyword" : {
                 "type" : "keyword",
-                "ignore_above" : 256
+                "ignore_above" : 500
               }
             }
           },
@@ -564,13 +254,8 @@
             }
           },
           "publishDate" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 256
-              }
-            }
+            "type" : "date",
+            "format": "dd.MM.yy"
           },
           "rateCount" : {
             "type" : "text",
@@ -598,7 +283,7 @@
             "fields" : {
               "keyword" : {
                 "type" : "keyword",
-                "ignore_above" : 256
+                "ignore_above" : 50
               }
             }
           },
@@ -644,15 +329,17 @@
             "fields" : {
               "keyword" : {
                 "type" : "keyword",
-                "ignore_above" : 256
+                "ignore_above" : 70
               }
             }
           },
           "crawledDate" : {
-            "type" : "date"
+            "type" : "date",
+            "format": "dd.MM.yy"
           }
         }
       }
     }
   }
 }
+'

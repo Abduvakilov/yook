@@ -1,80 +1,57 @@
-const elastic = require('./../search_module/elastic'),
-    request = require('../modules/charset'),
-    entities = require('entities'),
-    options = {
-      method: "GET",            //Set HTTP method
-      jar: true,              //Enable cookies
-      headers: {              //Set headers
-        "User-Agent": "Firefox/48.0"
-      }
-    },
-    makeDriver = require('request-x-ray'),
-    driver = makeDriver(options),    //Create driver
-    u = require('url'),
-    isEmpty = require('is-empty'),
-    Xray = require('x-ray'),
-    x = Xray({
-      filters: {
-        whiteSpace: function (value) {
-          return typeof value === 'string' ? value.replace(/(?:\r\n|\r|\n|\t)/g, ' ').replace(/ +/g, ' ').replace(/'/g, "''").trim() : value
-        },
-        decode: function (value) {
-          return typeof value === 'string' ? entities.decodeHTML(value) : value
-        },
-        replaceLineBreak: function (value) { 
-          return typeof value === 'string' ? value.replace(/\<br\>/g, ';;') : value
-        },
-        afterATag: function (value){
-          return typeof value === 'string' ? value.split('</a>')[1] : value
-        },
-        parseInt: function (value){
-          return typeof value === 'string' ? parseInt(value) : value
-        }
-      }
-    }).driver(request('windows-1251'), driver)
+let x = require('../modules/scrape/xray')('windows-1251'),
+  elastic = require('../search_module/elastic6'),
+  u = require('url');
 
 const START_URL = "http://topmusic.uz/",
-    SHORT_ADDRESS = "topmusic.uz",
-    MAX_PAGES_TO_VISIT = 100000,
-    SCOPE = 'body',
-    followLink = ['a[href^="'+ START_URL +'"]:not([href*="download/"]):not([href$=".jpg"]):not([href*="play/"]):not([href*="/get/"]):not([href*="#"])@href'],
-    artistPage = {
-      artist: x('.box-mid', {
-        artist: 'h2',
-        genre: 'a.color1',
-        clips: x('.clip-box', [{
-          name: 'a.clip-name',
-          link: 'a.clip-name@href'
-        }]),
-        singles: x('.block tr', [{
-          name: 'span',
-          link: 'a.download@href'
-        }]),
-      }),
-      pageLinks: followLink
-    },
-    albumPage = {
-      album: x('.box-mid', {
-        name : 'tr:first-child td:nth-child(2)',
-        artist: 'tr:nth-child(2) td:nth-child(2)',
-        genre: 'tr:nth-child(3) td:nth-child(2)',
-        year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
-        link: 'tr:nth-child(6) td:nth-child(2) a@href',
-        songs: x('.block tr', [{
-          name: 'span',
-          link: 'a.download@href'
-        }]),
-      }),
-      pageLinks: followLink
-    };
+  followLink = ['a[href^="'+ START_URL +'"]:not([href*="download/"]):not([href$=".jpg"]):not([href*="play/"]):not([href*="/get/"]):not([href*="#"])@href'],
+  artistPage = {
+    artist: x('.box-mid', {
+      artist: 'h2',
+      genre: 'a.color1',
+      clips: x('.clip-box', [{
+        name: 'a.clip-name',
+        link: 'a.clip-name@href'
+      }]),
+      singles: x('.block tr', [{
+        name: 'span',
+        link: 'a.download@href'
+      }]),
+    }),
+    pageLinks: followLink
+  },
+  albumPage = {
+    album: x('.box-mid', {
+      name : 'tr:first-child td:nth-child(2)',
+      artist: 'tr:nth-child(2) td:nth-child(2)',
+      genre: 'tr:nth-child(3) td:nth-child(2)',
+      year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
+      link: 'tr:nth-child(6) td:nth-child(2) a@href',
+      songs: x('.block tr', [{
+        name: 'span',
+        link: 'a.download@href'
+      }]),
+    }),
+    pageLinks: followLink
+  },
+  SHORT_ADDRESS = u.parse(START_URL).hostname,
+  SCOPE = 'body',
+  MAX_PAGES_TO_VISIT = process.env.max || 10000;
 function condition(obj){
   if (SELECTOR === albumPage) {return true} else {
-  return  ((!isEmpty(obj.artist.clips[0]) || !isEmpty(obj.artist.singles)) && !isEmpty(obj.artist.artist))};
+  return  (((obj.artist.clips[0]) || (obj.artist.singles)) && (obj.artist.artist))};
 };
 
 let SELECTOR = {},
     numPagesVisited = 0,
-    url = START_URL;
+    url = START_URL,
+    reindex = false;
+let date = new Date(),
+    month = date.getMonth() + 1;
+month = (month < 10 ? "0" : "") + month;
+let day  = date.getDate();
+day = (day < 10 ? "0" : "") + day;
+let today = day + '.' + month + '.' + (date.getYear()-100);
+  
 
 elastic.nextPages[0] = {_id: url};
 crawl();
@@ -114,44 +91,27 @@ function visitPage(url, callback) {
     if (err) {
       console.error(err);
       callback();
-    } else {
-      let time = new Date().toISOString();     
+    } else {     
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
-        obj.crawledDate = time;
+        obj.crawledDate = today;
         console.log(obj)
 
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
+                params : {time : today}
               }}, final )       
         );
       } else final();
       
       function final(){
-        for (i = 0; i < pageLinks.length; i++) {
-          if (!u.parse(pageLinks[i]).hostname.includes(SHORT_ADDRESS)){
-            console.log('___________________________' + pageLinks.splice(i, 1));
-          }
-          if (i >= pageLinks.length - 1 ){
-            // console.log(obj);
-            elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
-              elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
-              }}, callback);
-            })
-          }
-        }
-        if ( 0 == pageLinks.length){
-          console.log('no links at ' + url);
-          elastic.linksToVisit(pageLinks, SHORT_ADDRESS, function(){
-            elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-              params : {time : time}
-            }}, callback);
-          })
-        }
+        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
+          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            params : {time : today}
+          }}, callback);
+        })
       }
     }
   });

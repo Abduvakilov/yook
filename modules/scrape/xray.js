@@ -15,8 +15,9 @@ const charset = require('superagent-charset'),
       }
     },
     u = require('url'),
+    moment = require('moment');
+let superagent = charset(request),
     Xray = require('x-ray');
-var superagent = charset(request);
 module.exports = x;
 function x(enc, phant) {
   return Xray({
@@ -45,11 +46,28 @@ function x(enc, phant) {
         parseFloat: function (value){
           return typeof value === 'string' ? parseFloat(value) : value
         },
-        // date: function (value) {
-        //   return typeof value === 'string' ? elastic.moment(value, 'DD MMMM YYYY', 'ru').toISOString() : value
-        // }
+        date: function (value) {
+          return typeof value === 'string' ? moment(value, 'DD MMMM YYYY', 'ru').format('DD.MM.YY') : value
+        },
+        removeSpoiler: function (value) {
+          return typeof value === 'string' ? value.replace('свернуть развернуть', '') : value //mover
+        },
+        //alltor
+        replaceLineBreak: function (value) { 
+          return typeof value === 'string' ? value.replace(/>/g, '> ') : value
+        },
+        deleteDownload: function (value) {
+          return typeof value === 'string' ? value.replace('Скачать Скачать бесплатно и на максимальной скорости! Как скачивать? · Что такое торрент? · Рейтинг и ограничения', '') : value          
+        },
+        removeTags: function (value) {
+          return typeof value === 'string' ? value.replace(/<(?:.|\n)*?>/gm, '') : value          
+        },
+        //megasoft
+        removeDown: function (value) {
+          return typeof value === 'string' ? value.replace('Скачать этот файл', '') : value
+        }
       }
-    }).driver(phant ? phantom(phantomOptions) : driver(enc, options))
+    }).driver(enc ? driver(enc, options) : phantom(phantomOptions))
 }
 function driver(enc, opts) {
   var agent = superagent.agent(opts || {})

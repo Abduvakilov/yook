@@ -1,12 +1,19 @@
 module.exports = start;
-function start(START_URL,TARGET,SELECTOR,ENCODING,MAX_PAGES_TO_VISIT,URL_SHOULD_NOT_CONTAIN){
-let elastic = require('../../search_module/elastic'),
+function start(START_URL,TARGET,SELECTOR,ENCODING){
+let elastic = require('../../search_module/elastic6'),
   x = require('./xray')(ENCODING),
   SHORT_ADDRESS = require('url').parse(START_URL).hostname,
-  SCOPE = 'body';
+  SCOPE = 'body',
+  MAX_PAGES_TO_VISIT = process.env.max || 10000;
 let numPagesVisited = 0,
     url = START_URL;
-
+let date = new Date(),
+  month = date.getMonth() + 1;
+month = (month < 10 ? "0" : "") + month;
+let day  = date.getDate();
+day = (day < 10 ? "0" : "") + day;
+let today = day + '.' + month + '.' + (date.getYear()-100);
+    
 elastic.nextPages[0] = {_id: url};
 crawl()
 function crawl() {
@@ -41,25 +48,24 @@ function visitPage(url, callback) {
       console.error(err);
       callback();
     } else {
-      let time = new Date().toISOString();     
       let pageLinks = obj.pageLinks;
-      delete obj.pageLinks
-      if (obj[TARGET]) {
+      delete obj.pageLinks;
+      if (typeof obj[TARGET] !== 'object' ? obj[TARGET] : obj[TARGET].length > 0 ) {
         console.log('target exists at page ' + url);
-        obj.crawledDate = time;
+        obj.crawledDate = today;
         console.log(obj)
 
-        elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
+        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, 
           elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : time}
-              }}, callback )       
+          params : {time : today}
+          }}, callback)
         );
       } else final();
       
       function final(){
-        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, URL_SHOULD_NOT_CONTAIN, function(){
+        elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
           elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-            params : {time : time}
+            params : {time : today}
           }}, callback);
         })
       }

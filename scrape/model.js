@@ -14,8 +14,6 @@ const START_URL = "http://player.uz/",
       description: 'div.description .story p',
       pageLinks: ['a[href^="'+ START_URL +'"]:not([href$=".jpg"]):not([href*="#"]):not([href*="?season="]):not([href*="?cpage="]):not([href*="?stuffers"])@href']
     },
-    MAX_PAGES_TO_VISIT = process.env.max ? process.env.max : 143,
-    ENCODING = 'windows-1251',
-    // URL_SHOULD_NOT_CONTAIN = null;
+    ENCODING = 'windows-1251';
 
-require('../modules/scrape')(START_URL,TARGET,SELECTOR,ENCODING,MAX_PAGES_TO_VISIT,URL_SHOULD_NOT_CONTAIN);
+require('../modules/scrape')(START_URL,TARGET,SELECTOR,ENCODING);
