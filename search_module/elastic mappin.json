@@ -1,4 +1,4 @@
-curl -XPUT 'localhost:9200/crawl?pretty' -H 'Content-Type: application/json' -d'
+curl -XPUT 'localhost:9200/targets?pretty' -H 'Content-Type: application/json' -d'
 {
     "mappings" : {
       "targets" : {
@@ -321,25 +321,35 @@ curl -XPUT 'localhost:9200/crawl?pretty' -H 'Content-Type: application/json' -d'
             "type" : "long"
           }
         }
-      },
-      "crawled" : {
-        "properties" : {
-          "crawled" : {
-            "type" : "text",
-            "fields" : {
-              "keyword" : {
-                "type" : "keyword",
-                "ignore_above" : 70
-              }
-            }
-          },
-          "crawledDate" : {
-            "type" : "date",
-            "format": "dd.MM.yy"
-          }
-        }
       }
     }
   }
 }
 '
+
+curl -XPUT 'localhost:9200/crawled?pretty' -H 'Content-Type: application/json' -d'
+{
+    "mappings" : {
+        "crawled" : {
+          "properties" : {
+            "crawled" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 70
+                }
+              }
+            },
+            "crawledDate" : {
+              "type" : "date",
+              "format": "dd.MM.yy"
+            }
+          }
+        }
+    }
+}
+'
+
+curl -XDELETE 'localhost:9200/crawled?pretty'
+

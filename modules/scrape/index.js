@@ -61,7 +61,6 @@ function visitPage(url, callback) {
           }}, callback)
         );
       } else final();
-      
       function final(){
         elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
           elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",

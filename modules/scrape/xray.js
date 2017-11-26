@@ -49,9 +49,6 @@ function x(enc, phant) {
         date: function (value) {
           return typeof value === 'string' ? moment(value, 'DD MMMM YYYY', 'ru').format('DD.MM.YY') : value
         },
-        removeSpoiler: function (value) {
-          return typeof value === 'string' ? value.replace('свернуть развернуть', '') : value //mover
-        },
         //alltor
         replaceLineBreak: function (value) { 
           return typeof value === 'string' ? value.replace(/>/g, '> ') : value
@@ -65,7 +62,11 @@ function x(enc, phant) {
         //megasoft
         removeDown: function (value) {
           return typeof value === 'string' ? value.replace('Скачать этот файл', '') : value
-        }
+        },
+        //origin mediabay
+        removeComma: function (value) {
+          return typeof value === 'string' ? value.replace(',', '') : value
+        },
       }
     }).driver(enc ? driver(enc, options) : phantom(phantomOptions))
 }
