@@ -56,14 +56,18 @@ function visitPage(url, callback) {
         console.log(obj)
 
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, 
-          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-          params : {time : today}
+          elastic.update("crawled", url, {script : {
+            inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            lang: 'painless',
+            params : {time : today}
           }}, callback)
         );
       } else final();
       function final(){
         elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
-          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+          elastic.update("crawled", url, {script : {
+            inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            lang: 'painless',
             params : {time : today}
           }}, callback);
         })
