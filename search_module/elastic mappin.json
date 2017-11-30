@@ -165,10 +165,6 @@ curl -XPUT 'localhost:9200/targets?pretty' -H 'Content-Type: application/json' -
             "type" : "date",
             "format": "dd.MM.yy"
           },
-          "datePublished" : {
-            "type" : "date",
-            "format": "dd.MM.yy"
-          },
           "description" : {
             "type" : "text",
             "fields" : {

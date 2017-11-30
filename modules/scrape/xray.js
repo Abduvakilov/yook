@@ -33,7 +33,7 @@ function x(enc, phant) {
         },
         toArray2: function (value) {
           return typeof value === 'string' ? value.split(', ') : value
-        }
+        },
         removeSpoiler: function (value) {
           return typeof value === 'string' ? value.replace('свернуть развернуть', '') : value
         },

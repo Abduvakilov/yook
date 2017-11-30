@@ -50,7 +50,7 @@ function visitPage(url, callback) {
     } else {
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks;
-      if (typeof obj[TARGET] !== 'object' ? obj[TARGET] : obj[TARGET].length > 0 ) {
+      if (typeof obj[TARGET] === 'object' && obj[TARGET] !== null ? obj[TARGET].length > 0 : obj[TARGET] ) {
         console.log('target exists at page ' + url);
         obj.crawledDate = today;
         console.log(obj)

@@ -102,10 +102,7 @@ module.exports = {
 		
 		function inner(){
 			if (array[i]){
-		 		if (reindex) {
-		 			bulk.push({update: {_id: array[i]}});
-					bulk.push({doc:{crawled: short_address}, doc_as_upsert : true});
-			 	} else {
+		 		if (array[i].length<250) {
 			 		bulk.push({index:{_id: array[i]}});
 					bulk.push({crawled: short_address});
 			 	};

@@ -8,7 +8,7 @@ const START_URL = "http://mytube.uz/",
       // videoLink: 'a[href*=".mp4"]@href',
       category: '.userinfobox-categories-tags-container a:first-child | whiteSpace',
       tags: ['.userinfobox-categories-tags-container a:not(:first-child) | whiteSpace'],
-      pageLinks: ['a[href*="mytube.uz"]:not[href*="mytube.uz/uz/"]:not[href*="mytube.uz/oz/"]:not[href*="#"]@href']
+      pageLinks: ['a[href*="mytube.uz"]:not([href*="mytube.uz/uz/"]):not([href*="mytube.uz/oz/"]):not([href*="#"])@href']
     },
     ENCODING = 'utf-8';
 

@@ -1,6 +1,6 @@
-const START_URL = "https://mover.uz",
+const START_URL = "https://mover.uz/",
     TARGET = 'views',
-    SELECTOR= {  
+    SELECTOR = {  
       title: '.fl.video-title | whiteSpace | decode',
       description: 'div.desc-text | decode | whiteSpace | removeSpoiler',
       views: 'span.fr.views | parseInt',
