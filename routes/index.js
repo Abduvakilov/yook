@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var search = require('../search_module/search');
+var search = require('../modules/search');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -19,7 +19,7 @@ router.get('/search', function(req, res) {
 			if (error) {
 				res.render('error', {message: 'Ошибка', error:{status: '', stack:''}})
 			} else {
-				res.render('index', { title: 'Поиск в Tas-ix',  query: sq, took:response.took, total: response.hits.total, results: response.hits.hits, startsWith: from});
+				res.render('index', { title: 'Поиск в Tas-ix',  query: sq, took:response.took, total: response.total, results: response.res, startsWith: from});
 	  		}
 	  	});
 	} else res.render('index', { title: 'Поиск в Tas-ix' });

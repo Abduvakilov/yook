@@ -1,44 +1,43 @@
 let x = require('../modules/scrape/xray')('windows-1251'),
-  elastic = require('../search_module/elastic6'),
+  elastic = require('../modules/scrape/elastic6'),
   u = require('url');
 
 const START_URL = "http://topmusic.uz/",
-  followLink = ['a[href^="'+ START_URL +'"]:not([href*="download/"]):not([href$=".jpg"]):not([href*="play/"]):not([href*="/get/"]):not([href*="#"])@href'],
+  followLink = ['a[href^="'+ START_URL +'"]:not([href*="download/"]):not([href$=".jpg"]):not([href$="/"]):not([href*="play/"]):not([href*="/get/"]):not([href*="#"])@href'],
   artistPage = {
-    artist: x('.box-mid', {
-      artist: 'h2',
-      genre: 'a.color1',
-      clips: x('.clip-box', [{
-        name: 'a.clip-name',
-        link: 'a.clip-name@href'
-      }]),
-      singles: x('.block tr', [{
-        name: 'span',
-        link: 'a.download@href'
-      }]),
-    }),
+    title: '.box-mid h2',
+    genre: '.box-mid a.color1',
+    clip: ['.box-mid .clip-box a.play_video@title | remove:"посмотреть  клип  - "'],
+    // x('.box-mid .clip-box', [{
+    //   name: 'a.clip-name',
+    //   link: 'a.clip-name@href'
+    // }]),
+    single: ['.box-mid .block tr a.play-track@title'], 
+    // x('.box-mid .block tr', [{
+    //   name: 'span',
+    //   link: 'a.download@href'
+    // }]),
     pageLinks: followLink
   },
   albumPage = {
-    album: x('.box-mid', {
-      name : 'tr:first-child td:nth-child(2)',
-      artist: 'tr:nth-child(2) td:nth-child(2)',
-      genre: 'tr:nth-child(3) td:nth-child(2)',
-      year: 'tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
-      link: 'tr:nth-child(6) td:nth-child(2) a@href',
-      songs: x('.block tr', [{
-        name: 'span',
-        link: 'a.download@href'
-      }]),
-    }),
+    albumName : '.box-mid tr:first-child td:nth-child(2)',
+    img: '.box-mid img@src',
+    artistName: '.box-mid tr:nth-child(2) td:nth-child(2)',
+    genre: '.box-mid tr:nth-child(3) td:nth-child(2)',
+    year: '.box-mid tr:nth-child(4) td:nth-child(2) | whiteSpace | parseInt',
+    link: 'tr:nth-child(6) td:nth-child(2) a@href',
+    song: ['.box-mid .block tr span'],
+    // x('.box-mid .block tr', [{
+    //   name: 'span',
+    //   link: 'a.download@href'
+    // }]),
     pageLinks: followLink
   },
   SHORT_ADDRESS = u.parse(START_URL).hostname,
   SCOPE = 'body',
   MAX_PAGES_TO_VISIT = process.env.max || 10000;
 function condition(obj){
-  if (SELECTOR === albumPage) {return true} else {
-  return  (((obj.artist.clips[0]) || (obj.artist.singles)) && (obj.artist.artist))};
+  return  (SELECTOR === albumPage)||((obj.clip[0] || obj.single[0]) && (obj.title));
 };
 
 let SELECTOR = {},
@@ -94,25 +93,37 @@ function visitPage(url, callback) {
     } else {     
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks
+
+      if(obj.single) obj.single=obj.single.map(x=> x.replace(obj.title+' - ', ''));
+      if(obj.artistName) obj.artistName=obj.artistName.trim();
+      if(obj.song) obj.song=obj.song.map(x=> x.replace(obj.artistName+' - ', ''));
+
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
         obj.crawledDate = today;
-        console.log(obj)
-
-        elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
-          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-                params : {time : today}
-              }}, final )       
+        for (let key in obj) {
+          if (obj[key].length==0||obj[key]==null||Number.isNaN(obj[key])) {
+            delete obj[key];
+          }
+        };
+        console.log(obj);
+        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, 
+          elastic.update("crawled", url, {script : {
+            inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            lang: 'painless',
+            params : {time : today}
+          }}, callback)
         );
       } else final();
-      
       function final(){
         elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
-          elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+          elastic.update("crawled", url, {script : {
+            inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
+            lang: 'painless',
             params : {time : today}
           }}, callback);
         })
       }
     }
   });
-}
+};

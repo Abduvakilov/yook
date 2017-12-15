@@ -1,5 +1,5 @@
 let x = require('../modules/scrape/xray')('utf-8'),
-  elastic = require('../search_module/elastic6'),
+  elastic = require('../modules/scrape/elastic6'),
   u = require('url');
 
 const START_URL = "http://mediabay.uz/",
@@ -26,10 +26,11 @@ const START_URL = "http://mediabay.uz/",
   musicPage = {
     title: 'h2.film-descr__header',
     img: 'img.film-descr__img@src',
-    music: x('div.music_in-album music-item', {
-      name: 'div.music__name',
-      link: 'div.music__player-btn a:nth-child(2)@href'
-    }),
+    music: ['div.music__name'],
+    // x('div.music_in-album .music-item', {
+    //   name: 'div.music__name',
+    //   link: 'div.music__player-btn a:nth-child(2)@href'
+    // }),
     description: 'div.film-descr__middle p',
     pageLinks: followLink
   },
@@ -86,7 +87,7 @@ function visitPage(url, callback) {
   numPagesVisited++;
   console.log("Visiting page " + numPagesVisited + ': ' + url);
 
-  x(url, SCOPE, SELECTOR)(function (err, obj) {
+  x(encodeURI(url), SCOPE, SELECTOR)(function (err, obj) {
     if (err) {
       console.error(err);
       callback();
@@ -96,8 +97,12 @@ function visitPage(url, callback) {
       if (condition(obj)) {
         console.log('condition achieved at page ' + url);
         obj.crawledDate = today;
+        for (let key in obj) {
+          if (obj[key].length==0||obj[key]==null||Number.isNaN(obj[key])) {
+            delete obj[key];
+          }
+        };
         console.log(obj)
-
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true},
           elastic.update("crawled", url, {script : {inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
                 params : {time : today}

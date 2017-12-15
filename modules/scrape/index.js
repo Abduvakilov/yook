@@ -1,6 +1,6 @@
 module.exports = start;
-function start(START_URL,TARGET,SELECTOR,ENCODING){
-let elastic = require('../../search_module/elastic6'),
+function start(START_URL,TARGET,SELECTOR,ENCODING,TRANSFORMATION){
+let elastic = require('./elastic6'),
   x = require('./xray')(ENCODING),
   SHORT_ADDRESS = require('url').parse(START_URL).hostname,
   SCOPE = 'body',
@@ -24,7 +24,7 @@ function crawl() {
   elastic.nextPage(SHORT_ADDRESS, function(nextPage){
     if (nextPage){
       elastic.exists(nextPage, function(exists){
-        if (exists === true) {
+        if (exists) {
         // We've already visited this page, so repeat the crawl
           crawl();
         }
@@ -43,7 +43,7 @@ function visitPage(url, callback) {
   numPagesVisited++;
   console.log("Visiting page " + numPagesVisited + ': ' + url);
 
-  x(url, SCOPE, SELECTOR)(function (err, obj) {
+  x(encodeURI(url), SCOPE, SELECTOR)(function (err, obj) {
     if (err) {
       console.error(err);
       callback();
@@ -52,9 +52,16 @@ function visitPage(url, callback) {
       delete obj.pageLinks;
       if (typeof obj[TARGET] === 'object' && obj[TARGET] !== null ? obj[TARGET].length > 0 : obj[TARGET] ) {
         console.log('target exists at page ' + url);
+        if(TRANSFORMATION){
+          TRANSFORMATION(obj);
+        };
         obj.crawledDate = today;
-        console.log(obj)
-
+        for (let key in obj) {
+          if (obj[key]==null||obj[key].length==0||Number.isNaN(obj[key])) {
+            delete obj[key];
+          }
+        };
+        console.log(obj);
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, 
           elastic.update("crawled", url, {script : {
             inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
