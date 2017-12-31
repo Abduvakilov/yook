@@ -28,8 +28,8 @@ module.exports = function(hits, from, query) {
 			subtitle='',
 			h=hits[i].highlight||{},
 			isArtist=(obj.single!=null || obj.clip!=null),
-	    	scorePerWord=hits[0]._score/query.trim().split(/\s+/).length
-    		top = (i===0 && from===0 && scorePerWord>10),
+	    	scorePerWord=hits[0]._score/(query.trim().split(/\s+/).length/2)
+    		top = (i===0 && from===0 && scorePerWord>9.9),
     		arrLength = top ? topArr : regArr,
     		title = obj.title ||  (obj.albumName + ' - ' + obj.artistName) || '',
     		obj.date=obj.year||(obj.publishDate?moment(obj.publishDate, 'DD.MM.YY').locale('ru').format('DD MMM YY [г.]'):''),
@@ -37,7 +37,8 @@ module.exports = function(hits, from, query) {
     			(obj.description?(obj.description.substring(0, 160) + ' ...'):''),
     		hTopList=h.song||(h.single&&h.clip?(h.single.length>=h.clip.length?h.single:h.clip):(h.single||h.clip))||[],
     		topList=obj.song||(obj.single&&obj.clip?(obj.single.length>=obj.clip.length?obj.single:obj.clip):(obj.single||obj.clip))||[];
-    	//
+		//
+		
     	let subarr=[];
     	for (st of subtitles) {
     		if (obj[st]) {

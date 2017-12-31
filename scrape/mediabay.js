@@ -3,7 +3,7 @@ let x = require('../modules/scrape/xray')('utf-8'),
   u = require('url');
 
 const START_URL = "http://mediabay.uz/",
-  followLink = ['a[href^="'+ START_URL +'"]:not([href^="http://mediabay.uz/uz/"]):not([href^="http://mediabay.uz/actor/"]):not([href$=".jpg"]):not([href*="#"])@href'],
+  followLink = ['a[href^="'+ START_URL +'"]:not([href^="http://mediabay.uz/uz/"]):not([href*="?page="]):not([href$=".jpg"]):not([href*="#"])@href'],
   moviePage = {
     title: 'h2.film-descr__header',
     subTitle: 'div.film-descr__meta > div:contains("Слоган") p.film-descr__meta-text',
@@ -94,7 +94,7 @@ function visitPage(url, callback) {
     } else {     
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks
-      if (condition(obj)) {
+      if (condition(obj) && !url.includes('page=')) {
         console.log('condition achieved at page ' + url);
         obj.crawledDate = today;
         for (let key in obj) {

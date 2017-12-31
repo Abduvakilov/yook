@@ -1,5 +1,5 @@
 const elasticsearch = require('elasticsearch'),
-    //transl = require('../modules/transl'),
+    // transl = require('../transl'),
     result = require('./result'),
     client = elasticsearch.Client({
       host: '127.0.0.1:9200',
@@ -7,7 +7,7 @@ const elasticsearch = require('elasticsearch'),
     });
 
 module.exports = function(sq, from, callback) {
-  //sq = sq + ' ' + transl(sq)
+  // sq = sq + ' ' + transl(sq)
   console.log(sq);
   client.search({
     index: 'targets',

@@ -14,8 +14,12 @@ let day  = date.getDate();
 day = (day < 10 ? "0" : "") + day;
 let today = day + '.' + month + '.' + (date.getYear()-100);
     
-elastic.nextPages[0] = {_id: url};
-crawl()
+// elastic.nextPages.push({_id: url});
+elastic.create(url, {crawled:SHORT_ADDRESS}, crawl
+//   function(){
+//   visitPage(url, crawl)
+// }
+);
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
     console.log("Reached limit of pages to visit.");
@@ -50,9 +54,9 @@ function visitPage(url, callback) {
     } else {
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks;
-      if (typeof obj[TARGET] === 'object' && obj[TARGET] !== null ? obj[TARGET].length > 0 : obj[TARGET] ) {
+      if (typeof obj[TARGET] === 'object' && obj[TARGET] !== null ? obj[TARGET].length > 0 : obj[TARGET] && !url.includes('page=')) {
         console.log('target exists at page ' + url);
-        if(TRANSFORMATION){
+        if(TRANSFORMATION!=null){
           TRANSFORMATION(obj);
         };
         obj.crawledDate = today;
@@ -67,7 +71,7 @@ function visitPage(url, callback) {
             inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
             lang: 'painless',
             params : {time : today}
-          }}, callback)
+          }}, final)
         );
       } else final();
       function final(){

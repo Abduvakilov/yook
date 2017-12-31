@@ -1,11 +1,8 @@
-const charset = require('superagent-charset'),
-    request = require('superagent'),
-    entities = require('entities'),
-    phantom = require('x-ray-phantom'),
-    phantomOptions = {
+const phantomOptions = {
+      weak: false,
       webSecurity: false,
       timeout: 1000,
-      resourceTimeout: 1000,
+      resourceTimeout: 5000,
       loadImages: false,
     },
     options = {           //Enable cookies
@@ -13,11 +10,15 @@ const charset = require('superagent-charset'),
         "User-Agent": "yook",
         Connection: "close"
       }
-    },
-    u = require('url'),
-    moment = require('moment');
-let superagent = charset(request),
+    };
+let u = require('url'),
+    moment = require('moment'),
+    request = require('superagent'),
+    entities = require('entities'),
+    phantom = require('x-ray-phantom'),
+    superagent = require('superagent-charset')(request),
     Xray = require('x-ray');
+    
 module.exports = x;
 function x(enc, phant) {
   return Xray({
@@ -90,7 +91,8 @@ function driver(enc, opts) {
       .get(ctx.url)
       .charset(enc)
       .set(ctx.headers)
-      // .timeout(5000)
+      .timeout(5000)
+      .retry(150, function(){console.log('retrying')})
       .end(function(err, res) {
         if (err && !err.status) return fn(err)
 
@@ -102,9 +104,9 @@ function driver(enc, opts) {
           : res.text
 
         // update the URL if there were redirects
-        ctx.url = res.redirects.length
-          ? res.redirects.pop()
-          : ctx.url
+        // ctx.url = res.redirects.length
+        //   ? res.redirects.pop()
+        //   : ctx.url
 
         return fn(null, ctx)
       })

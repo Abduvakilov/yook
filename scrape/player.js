@@ -1,11 +1,11 @@
 const START_URL = "http://player.uz",
     TARGET = 'title',
     SELECTOR = {
-      title: 'div.poster img@title',
+      title: 'div.poster img@title | decode',
       img: 'div.poster img@src',
       year: 'label:contains("Год выпуска") ~ p | parseFloat',
       country: 'label:contains("Страна") ~ p',
-      genre: ['div.clear label:contains("Жанр") ~ p a'],
+      genre: 'label:contains("Жанр") ~ p',
       forAge: 'label:contains("Возрастное ограничение") ~ p',
       rating: 'div.description #average | parseFloat',
       rateCount: 'div.description #rate-count',

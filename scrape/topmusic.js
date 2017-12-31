@@ -3,7 +3,7 @@ let x = require('../modules/scrape/xray')('windows-1251'),
   u = require('url');
 
 const START_URL = "http://topmusic.uz/",
-  followLink = ['a[href^="'+ START_URL +'"]:not([href*="download/"]):not([href$=".jpg"]):not([href$="/"]):not([href*="play/"]):not([href*="/get/"]):not([href*="#"])@href'],
+  followLink = ['a[href^="'+ START_URL +'"]:not([href*="download/"]):not([href$=".jpg"]):not([href$=".pls"]):not([href*="play/"]):not([href*="/get/"]):not([href*="#"])@href'],
   artistPage = {
     title: '.box-mid h2',
     genre: '.box-mid a.color1',
@@ -52,8 +52,9 @@ day = (day < 10 ? "0" : "") + day;
 let today = day + '.' + month + '.' + (date.getYear()-100);
   
 
-elastic.nextPages[0] = {_id: url};
-crawl();
+// elastic.nextPages[0] = {_id: url};
+elastic.create(url, {crawled:SHORT_ADDRESS}, crawl);
+
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
     console.log("Reached max limit of number of pages to visit.");
@@ -94,12 +95,14 @@ function visitPage(url, callback) {
       let pageLinks = obj.pageLinks;
       delete obj.pageLinks
 
-      if(obj.single) obj.single=obj.single.map(x=> x.replace(obj.title+' - ', ''));
-      if(obj.artistName) obj.artistName=obj.artistName.trim();
-      if(obj.song) obj.song=obj.song.map(x=> x.replace(obj.artistName+' - ', ''));
-
       if (condition(obj)) {
+        if(url.endsWith('/')) {url=url.slice(0,-1); elastic.create(url, {crawled:SHORT_ADDRESS})};
         console.log('condition achieved at page ' + url);
+
+        if(obj.single) obj.single=obj.single.map(x=> x.replace(obj.title+' - ', ''));
+        if(obj.artistName) obj.artistName=obj.artistName.trim();
+        if(obj.song) obj.song=obj.song.map(x=> x.replace(obj.artistName+' - ', ''));
+
         obj.crawledDate = today;
         for (let key in obj) {
           if (obj[key].length==0||obj[key]==null||Number.isNaN(obj[key])) {

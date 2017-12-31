@@ -9,7 +9,15 @@ html
       form(action='/search' method='get')
         input(type="text" name="search" autofill="false" id="searchbar" value=query)
         button(type="submit") Поиск
-      
+        img(src="/images/logo.png" alt="logo") 
+        span.grey  α
+    if !results
+      div.noresult
+        p yook.uz - это система для поиска фильмов, программ, игр и других контент в сети Tas-IX.
+        p yook.uz отличается от других поисковых систем тем что система выдаёт результаты из подобранных сайтов в Tas-ix и специализирован только на поиске файлов что очень важно для экономии трафика. 
+        p Сервис работает в режиме начального тестирование и включает немного, но качественные сайты национальной сети. Свои желание и вопроси по проекту можете отправит по почте 
+          a(href="mailto:abd_dilshod@mail.ru") abd_dilshod@mail.ru
+
     if results
       if total==0 
         div.noresult
@@ -64,9 +72,9 @@ html
                 //- if (results[0].isArtist)
               div.desc
 
-                if (results[0].genre!='')   
+                if (results[0].genre!=null?results[0].genre.length!=0:false)   
                   b Жанр: 
-                  | !{results[0].genre}
+                  | !{Array.isArray(results[0].genre)?results[0].genre.join(', '):results[0].genre}
 
 
                 if (results[0].scores)

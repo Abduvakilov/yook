@@ -20,4 +20,4 @@ const START_URL = "http://itv.uz/",
     MAX_PAGES_TO_VISIT = process.env.max || 1000,
     ENCODING = null; //enables phantom
     
-require('../modules/scrape')(START_URL,TARGET,SELECTOR,ENCODING,MAX_PAGES_TO_VISIT);
+require('../modules/scrape')(START_URL,TARGET,SELECTOR,ENCODING);

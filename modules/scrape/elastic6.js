@@ -28,22 +28,36 @@ module.exports = {
 	  })
 	},
 
-	// create: function(type, id, body){  
-	// 	client.create({
-	// 	    index: index, 
-	// 	    type: index, 
-	// 	    id: id, 
-	// 	    body: body 
-	//   }, function(error, response) {
-	// 	    if (error) {
-	// 	      console.error(error);
-	// 	      // return;
-	// 	    }
-	// 	    else {
-	// 	    // console.log(response);
-	// 	    }
-	//   })
-	// },
+	create: function(id, body, callback){
+		client.get({
+			index: 'crawled',
+			type: 'crawled',
+			id: id
+		}, function (error, response) {
+			if (!error) {
+				if (callback) {	
+					callback();
+				}
+			} else {
+				client.create({
+					index: 'crawled', 
+					type: 'crawled', 
+					id: id, 
+					body: body 
+				}, function(error, response) {
+					if (error) {
+					console.error(error);
+					// return;
+					}
+					else {
+						if (callback) {
+							setTimeout(callback,1000);
+						}
+					}
+				})
+			}
+		})
+	},
 
 	exists: function(id, callback){
 		client.get({
