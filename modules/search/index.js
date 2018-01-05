@@ -7,6 +7,7 @@ const elasticsearch = require('elasticsearch'),
     });
 
 module.exports = function(sq, from, callback) {
+  let wordcount = sq.trim().split(/\s+/).length;
   // sq = sq + ' ' + transl(sq)
   console.log(sq);
   client.search({
@@ -53,7 +54,7 @@ module.exports = function(sq, from, callback) {
           if (error) console.error(error);
           let res=[];
           if (response.hits) {
-            res=result(response.hits.hits, from, sq);
+            res=result(response.hits.hits, from, wordcount);
             console.log(res);
           };
           callback(error, {res:res,total:response.hits.total,took:response.took});

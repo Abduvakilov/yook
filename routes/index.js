@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/search', function(req, res) {
-	let sq = req.query.search;
+	let sq = req.query.search.trim();
 	let from = 0;
 	if ( !isNaN(parseInt(req.query.startsWith)) ){
 		from = parseInt(req.query.startsWith);
@@ -17,12 +17,12 @@ router.get('/search', function(req, res) {
 	if (sq) {
 		search(sq, from, function(error, response) {
 			if (error) {
-				res.render('error', {message: 'Ошибка', error:{status: '', stack:''}})
+				res.render('error', {message: 'Ошибка', error:{status: error.status, stack:''}})
 			} else {
-				res.render('index', { title: 'Поиск в Tas-ix',  query: sq, took:response.took, total: response.total, results: response.res, startsWith: from});
+				res.render('index', { query: sq, took:response.took, total: response.total, results: response.res, startsWith: from});
 	  		}
 	  	});
-	} else res.render('index', { title: 'Поиск в Tas-ix' });
+	} else res.render('index');
 });
 
 module.exports = router;
