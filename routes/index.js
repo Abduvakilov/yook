@@ -5,7 +5,7 @@ var search = require('../modules/search');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Поиск в Tas-ix' });
+  res.render('index');
 });
 
 router.get('/search', function(req, res) {

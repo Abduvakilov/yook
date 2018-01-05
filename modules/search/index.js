@@ -17,7 +17,7 @@ module.exports = function(sq, from, callback) {
         function_score: {
           functions: [{
             gauss: {
-              publishDate: {scale: '180d'}
+              publishDate: {scale: '180d', decay: 0.9}
             }
           }],
           query: {
