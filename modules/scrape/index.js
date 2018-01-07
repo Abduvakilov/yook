@@ -14,11 +14,11 @@ let day  = date.getDate();
 day = (day < 10 ? "0" : "") + day;
 let today = day + '.' + month + '.' + (date.getYear()-100);
     
-// elastic.nextPages.push({_id: url});
-elastic.create(url, {crawled:SHORT_ADDRESS}, crawl
-//   function(){
-//   visitPage(url, crawl)
-// }
+elastic.nextPages.push({_id: url});
+elastic.create(url, {crawled:SHORT_ADDRESS}, //crawl
+  function(){
+  visitPage(url, crawl)
+}
 );
 function crawl() {
   if (numPagesVisited >= MAX_PAGES_TO_VISIT) {
@@ -27,6 +27,7 @@ function crawl() {
   }
   elastic.nextPage(SHORT_ADDRESS, function(nextPage){
     if (nextPage){
+      // console.log(nextPage)
       elastic.exists(nextPage, function(exists){
         if (exists) {
         // We've already visited this page, so repeat the crawl

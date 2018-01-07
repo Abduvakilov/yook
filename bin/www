@@ -88,18 +88,3 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
-
-
-var localtunnel = require('localtunnel');
-
-var tunnel = localtunnel(port, {subdomain:'yook'}, function(err, tunnel) {
-    if (err) console.error(err)
-
-    // the assigned public url for your tunnel
-    // i.e. https://abcdefgjhij.localtunnel.me
-    console.log('tunnel on ' + tunnel.url);
-});
-
-tunnel.on('close', function() {
-    // tunnels are closed
-});
