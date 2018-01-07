@@ -18,7 +18,9 @@ let u = require('url'),
     phantom = require('x-ray-phantom'),
     superagent = require('superagent-charset')(request),
     Xray = require('x-ray');
-    
+
+moment.defaultFormat = 'DD.MM.YY'
+
 module.exports = x;
 function x(enc, phant) {
   return Xray({
@@ -54,9 +56,20 @@ function x(enc, phant) {
         return typeof value === 'string' ? parseFloat(value) : value
       },
       date: function (value) {
-        return typeof value === 'string' ? moment(value, 'DD MMMM YYYY', 'ru').format('DD.MM.YY') : value
+        return typeof value === 'string' ? moment(value, 'DD MMMM YYYY', 'ru').format() : value
       },
       //alltor
+      dateAlltor: function (value) {
+        if (typeof value === 'string'){
+          if (value.includes('Вчера')){
+            return moment().subtract(1, 'day').format();
+          } else if (value.includes('Сегодня')){
+            return moment().format();
+          } else {
+            return moment(value.substring(0,11), 'DD-MMM-YYYY', 'ru').format();
+          };
+        };
+      },
       replaceLineBreak: function (value) { 
         return typeof value === 'string' ? value.replace(/\<br\>/g, '‧').replace(/\<\/p\>/g, '‧') : value
       },

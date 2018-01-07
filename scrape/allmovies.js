@@ -3,7 +3,7 @@ const START_URL = "https://allmovies.uz/",
     SELECTOR = {
       title: 'div#desc h1.title',
       subTitle: 'div#desc h2.title_orig',
-      img: 'div#desc div.pic img@src',
+      img: 'div.pic img@src',
       year: 'div#desc div.year | parseFloat',
       country: 'div#desc div.countries',
       genre: ['div#desc div.genres a'],
