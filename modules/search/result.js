@@ -21,15 +21,15 @@ let moment = require('moment'),
 		'subtitle', 'date', 'genre'
 	];
 const topLength=230, topArr=6, regArr=3;
-module.exports = function(hits, from, query) {
+module.exports = function(hits, from, wordcount) {
 	let res = [];
     for (let i = 0; i < hits.length; i++){
 		let obj=hits[i]._source,
 			subtitle='',
 			h=hits[i].highlight||{},
 			isArtist=(obj.single!=null || obj.clip!=null),
-	    	scorePerWord=hits[0]._score/(query.trim().split(/\s+/).length/2)
-    		top = (i===0 && from===0 && scorePerWord>9.9),
+	    	scorePerWord=hits[0]._score/wordcount
+    		top = (i===0 && from===0 && scorePerWord>11),
     		arrLength = top ? topArr : regArr,
     		title = obj.title ||  (obj.albumName + ' - ' + obj.artistName) || '',
     		obj.date=obj.year||(obj.publishDate?moment(obj.publishDate, 'DD.MM.YY').locale('ru').format('DD MMM YY [г.]'):''),
