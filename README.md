@@ -9,3 +9,4 @@ alpha
 - Making scraping faster by rewriting the code in higher level languages
 - improving search, Phonetic search
 - homepage redesign
+- grouping: videos, music, apps, games
