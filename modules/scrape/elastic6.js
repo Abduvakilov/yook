@@ -1,6 +1,7 @@
-let elasticsearch = require('elasticsearch'),
+let es = process.env.es || 'localhost:9200',
+	elasticsearch = require('elasticsearch'),
     client = elasticsearch.Client({
-      host: process.env.es || 'localhost:9200',
+      host: es,
       log: 'error'
     }),
     u = require('url'),
