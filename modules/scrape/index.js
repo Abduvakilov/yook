@@ -60,27 +60,18 @@ function visitPage(url, callback) {
           TRANSFORMATION(obj);
         };
         obj.crawledDate = today;
+        obj.site = SHORT_ADDRESS;
         for (let key in obj) {
           if (obj[key]==null||obj[key].length==0||Number.isNaN(obj[key])) {
             delete obj[key];
           }
         };
         console.log(obj);
-        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, 
-          elastic.update("crawled", url, {script : {
-            inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-            lang: 'painless',
-            params : {time : today}
-          }}, final)
-        );
+        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final);
       } else final();
       function final(){
         elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
-          elastic.update("crawled", url, {script : {
-            inline : "ctx._source.remove('crawled'); ctx._source.crawledDate = params.time",
-            lang: 'painless',
-            params : {time : today}
-          }}, callback);
+          elastic.update("crawled", url, {doc:{crawledDate: today}, doc_as_upsert : true}, callback);
         })
       }
     }

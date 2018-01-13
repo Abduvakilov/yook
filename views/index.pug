@@ -90,17 +90,17 @@ html
                   div.desc !{results[0].tdesc}
 
                   //- br
-                if (results[0].tlist.length>0)
+                if (results[0].tlist.length)
                   big Песни Исполнителя
-                  if (results[0].tmoreList.length>0)
+                  if (results[0].tmoreList.length)
                     input(type="checkbox" id="list")
                   ol
                     for item in results[0].tlist
                       li= item
-                    if (results[0].tmoreList.length>0)
+                    if (results[0].tmoreList.length)
                       span.more
                         for item in results[0].tmoreList
                           li= item
-                  if (results[0].tmoreList.length>0)       
+                  if (results[0].tmoreList.length)       
                     label(for="list") Ещё↓
     footer © 2017

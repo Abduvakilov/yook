@@ -18,14 +18,22 @@ module.exports = function(sq, from, callback) {
         function_score: {
           functions: [{
             gauss: {
-              publishDate: {scale: '180d', decay: 0.9}
-            }
+              publishDate: {scale: '180d', decay: 0.95}
+            },
+          },
+          {
+            filter: {
+              exists: {
+                field: 'publishDate'
+              }
+            },
+            weight:1.6
           }],
           query: {
             multi_match: {
               query: sq,
-              fields: ['title^1.6', 'description', 'category', 'tags', 'artistName^1.2', 'albumName^1.2', 'genre', 'song^1.1', 'single^1.1', 'clip^1.1'],
-              fuzziness: 1
+              fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.2', 'albumName^1.2', 'genre', 'song^1.1', 'single^1.1', 'clip^1.1'],
+              fuzziness: 'AUTO'
             }
           }
         }

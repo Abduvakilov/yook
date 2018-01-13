@@ -29,7 +29,7 @@ module.exports = function(hits, from, wordcount) {
 			h=hits[i].highlight||{},
 			isArtist=(obj.single!=null || obj.clip!=null),
 	    	scorePerWord=hits[0]._score/wordcount
-    		top = (i===0 && from===0 && scorePerWord>11),
+    		top = (i===0 && from===0 && scorePerWord>9.7),
     		arrLength = top ? topArr : regArr,
     		title = obj.title ||  (obj.albumName + ' - ' + obj.artistName) || '',
     		obj.date=obj.year||(obj.publishDate?moment(obj.publishDate, 'DD.MM.YY').locale('ru').format('DD MMM YY [г.]'):''),
@@ -52,7 +52,7 @@ module.exports = function(hits, from, wordcount) {
     	let songs = hTopList.join(' ‧ ');
 
 		res.push({});
-		if (top){
+		if (top && (obj.description||topList.lenth)){
 			let tsub=(obj.year ? (obj.year+' г. ‧ ') : '')+(obj.genre||''),
 				tdesc=(obj.description ? 
 				(obj.description.length>topLength+10 ?

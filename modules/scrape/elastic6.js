@@ -1,15 +1,13 @@
 let elasticsearch = require('elasticsearch'),
     client = elasticsearch.Client({
-      host: 'localhost:9200',
+      host: process.env.es || 'localhost:9200',
       log: 'error'
     }),
     u = require('url'),
     http = require('http'),
-    https = require('https'),
-    date = require('../date');
+    https = require('https');
 
 module.exports = {
-	date: date,
 	nextPages: [],
 	update: function(index, id, body, callback){
 		client.update({
@@ -74,20 +72,28 @@ module.exports = {
 
 	nextPage: function(site, callback){
 		if (module.exports.nextPages.length != 0) {
-			// console.log('There is an array of pages waiting '+module.exports.nextPages.length)
 			callback(module.exports.nextPages.splice(0, 1)[0]._id);
 		} else {
 			client.search({
 			    index: "crawled", 
 			    type: "crawled",
 			    body: {
-						size : 100,
-						query: {
-							constant_score: {
-								filter: {term: {crawled: site}}
+					size : 100,
+					query: {
+						bool: {
+							must: {
+								constant_score: {
+									filter: {term: {crawled: site}}
+								}
+							},
+							must_not: {
+								exists: {
+									field: 'crawledDate'
+								}
 							}
 						}
 					}
+				}
 		  	}, function (error, response) {
 				if (error) {
 			      console.error(error);
@@ -144,21 +150,5 @@ module.exports = {
   			}
 		});
 	},
-
-	// notCrawled: function(url){
-	// 	client.update({
-	// 	    index: "crawl", 
-	// 	    type: "crawled",
-	// 	    id: url,
-	// 	    body: {doc:{crawled:false}}
-	//   	}, function (error, response) {
-	// 	  if (error) {
-	// 	      console.error(error);
-	// 	      // return;
-	// 	    }
-	// 	    else {
-	// 	    	// console.log(response.hits.hits[0]._id);
-	// 	    }
-	// 	})
-	// },
+	
 };
