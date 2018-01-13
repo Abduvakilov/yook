@@ -3,7 +3,7 @@ const START_URL = "http://mytube.uz/",
     SELECTOR = {
       title: 'h2',
       description:'#aboutUser pre | whiteSpace',
-      views: '.Views-Container | parseInt',
+      // views: '.Views-Container | parseInt',
       publishDate: '.Date | date',
       // videoLink: 'a[href*=".mp4"]@href',
       category: '.userinfobox-categories-tags-container a:first-child | whiteSpace',

@@ -96,7 +96,7 @@ function visitPage(url, callback) {
       delete obj.pageLinks
 
       if (condition(obj)) {
-        if(url.endsWith('/')) {url=url.slice(0,-1); elastic.create(url, {crawled:SHORT_ADDRESS})};
+        if(url.endsWith('/')) {url2=url.slice(0,-1); elastic.create(url2, {crawledDate:today, crawled:SHORT_ADDRESS})} else url2=url;
         console.log('condition achieved at page ' + url);
 
         if(obj.single) obj.single=obj.single.map(x=> x.replace(obj.title+' - ', ''));
@@ -110,7 +110,7 @@ function visitPage(url, callback) {
           }
         };
         console.log(obj);
-        elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final);
+        elastic.update("targets", url2, {doc:obj, doc_as_upsert : true}, final);
       } else final();
       function final(){
         elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
