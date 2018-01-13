@@ -2,7 +2,7 @@ const elasticsearch = require('elasticsearch'),
     // transl = require('../transl'),
     result = require('./result'),
     client = elasticsearch.Client({
-      host: '127.0.0.1:9200',
+      host: process.env.es || 'localhost:9200',
       log: 'error'
     });
 
