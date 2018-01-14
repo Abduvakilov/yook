@@ -9,7 +9,8 @@ html
       form(action='/search' method='get')
         input(type="text" name="search" autofill="false" id="searchbar" value=query)
         button(type="submit") Поиск
-        img(src="/images/logo.png" alt="logo") 
+        a#logo(href='/')
+          img(src="/images/logo.png" height="37" width="80" alt="logo") 
         span.grey  α
     if !results
       div.noresult

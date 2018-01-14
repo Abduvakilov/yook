@@ -9,6 +9,7 @@ a {
 	display: inline-block;
 	color: #0099FF;
 	text-decoration: none;
+	font-size: 1em;
 }
 a:hover {
 	text-decoration: underline;
@@ -40,7 +41,7 @@ button {
 button:hover {
 	background: #bf40bf;
 }
-header img {
+#logo {
 	margin: 0 0 0 50px;
 }
 /*input, button {
