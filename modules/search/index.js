@@ -27,7 +27,7 @@ module.exports = function(sq, from, callback) {
                 field: 'publishDate'
               }
             },
-            weight:1.6
+            weight:1.06
           }],
           query: {
             bool: {
@@ -42,6 +42,13 @@ module.exports = function(sq, from, callback) {
                 multi_match: {
                   query: sq,
                   fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
+                },
+                {
+                multi_match: {
+                  query: sq,
+                  type: 'phrase',
+                  fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
+                  boost: 3
                 }
               }
               ]
