@@ -44,12 +44,12 @@ module.exports = function(sq, from, callback) {
                 fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
               }
             },
-            weight: 1.8
+            weight: 1.7
           }],
           query: {
             multi_match: {
               query: sq,
-              fields: ['title^1.7', 'artistName^1.7', 'albumName^1.7', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'subTitle'],
+              fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
               fuzziness: 'AUTO',
               boost: 0.7
             }
