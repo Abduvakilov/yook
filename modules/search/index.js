@@ -30,10 +30,21 @@ module.exports = function(sq, from, callback) {
             weight:1.6
           }],
           query: {
-            multi_match: {
-              query: sq,
-              fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.2', 'albumName^1.2', 'genre', 'song^1.1', 'single^1.1', 'clip^1.1'],
-              fuzziness: 'AUTO'
+            bool: {
+              should: [{
+                multi_match: {
+                  query: sq,
+                  fields: ['title^1.7', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
+                  fuzziness: 'AUTO',
+                  boost: 0.7
+                }},
+                {
+                multi_match: {
+                  query: sq,
+                  fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
+                }
+              }
+              ]
             }
           }
         }
