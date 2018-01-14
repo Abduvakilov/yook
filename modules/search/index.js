@@ -18,40 +18,40 @@ module.exports = function(sq, from, callback) {
         function_score: {
           functions: [{
             gauss: {
-              publishDate: {scale: '180d', decay: 0.95}
+              publishDate: {scale: '180d', decay: 0.8}
             },
-          },
-          {
+          },{
             filter: {
               exists: {
                 field: 'publishDate'
               }
             },
-            weight:1.06
+            weight:1.25
+          },{
+            filter: {
+              multi_match: {
+                query: sq,
+                type: 'phrase',
+                fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'director', 'actor', 'subTitle', 'site'],
+                boost: 3
+              }
+            },
+            weight: 3
+          },{     
+            filter: {
+              multi_match: {
+                query: sq,
+                fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
+              }
+            },
+            weight: 1.8
           }],
           query: {
-            bool: {
-              should: [{
-                multi_match: {
-                  query: sq,
-                  fields: ['title^1.7', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
-                  fuzziness: 'AUTO',
-                  boost: 0.7
-                }},
-                {
-                multi_match: {
-                  query: sq,
-                  fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
-                }},
-                {
-                multi_match: {
-                  query: sq,
-                  type: 'phrase',
-                  fields: ['title^1.7', 'description', 'category', 'tags', 'artistName^1.7', 'albumName^1.7', 'genre', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'country', 'director', 'actor', 'subTitle', 'site'],
-                  boost: 3
-                }
-              }
-              ]
+            multi_match: {
+              query: sq,
+              fields: ['title^1.7', 'artistName^1.7', 'albumName^1.7', 'song^1.2', 'single^1.2', 'clip^1.2', 'music^1.2', 'subTitle'],
+              fuzziness: 'AUTO',
+              boost: 0.7
             }
           }
         }
@@ -67,12 +67,9 @@ module.exports = function(sq, from, callback) {
           description : {
             fragment_size : 80,
           },
-          song: {
-          },
-          single: {
-          },
-          clip: {
-          }
+          song: {},
+          single: {},
+          clip: {}
         },
       }
     }
