@@ -105,16 +105,14 @@ function driver(enc, opts) {
       .charset(enc)
       .set(ctx.headers)
       .timeout(5000)
-      .retry(150, function(){console.log('retrying')})
+      .retry(150)
       .end(function(err, res) {
         if (err && !err.status) return fn(err)
 
         ctx.status = res.status
         ctx.set(res.headers)
 
-        ctx.body = 'application/json' == ctx.type
-          ? res.body
-          : res.text
+        ctx.body = res.text
 
         // update the URL if there were redirects
         // ctx.url = res.redirects.length

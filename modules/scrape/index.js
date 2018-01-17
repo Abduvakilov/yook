@@ -68,11 +68,12 @@ function visitPage(url, callback) {
           }
         };
         console.log(obj);
+        let bulk = [];
         elastic.update("targets", url, {doc:obj, doc_as_upsert : true}, final);
       } else final();
       function final(){
         elastic.linksToVisit(pageLinks, SHORT_ADDRESS, false, function(){
-          elastic.update("crawled", url, {doc:{crawledDate: today}, doc_as_upsert : true}, callback);
+          elastic.update("crawled", url, {doc:{crawledDate: today, isTarget:obj.site!=null}, doc_as_upsert : true}, callback);
         })
       }
     }
