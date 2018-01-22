@@ -61,6 +61,7 @@ function x(enc, phant) {
       //alltor
       dateAlltor: function (value) {
         if (typeof value === 'string'){
+          value = value.trim();
           if (value.includes('Вчера')){
             return moment().subtract(1, 'day').format();
           } else if (value.includes('Сегодня')){

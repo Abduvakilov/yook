@@ -81,11 +81,7 @@ module.exports = {
 					size : 100,
 					query: {
 						bool: {
-							must: {
-								constant_score: {
-									filter: {term: {crawled: site}}
-								}
-							},
+							must: {match: {crawled: site}},
 							must_not: {
 								exists: {
 									field: 'crawledDate'
