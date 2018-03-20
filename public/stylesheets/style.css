@@ -17,6 +17,24 @@ a:hover {
 a:visited {
 	color: #00f;
 }
+.c {
+	width: 620px;
+	height: 460px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-top: -230px;
+	margin-left: -310px;
+}
+.hc {
+	margin: 0 auto;
+	width: auto;
+	display: table;
+	position: relative;
+}
+#logol {
+	margin-bottom: 50px
+}
 #searchbar {
 	/*margin: 0;*/
 	border: solid 1px #993399;
@@ -43,6 +61,12 @@ button:hover {
 }
 #logo {
 	margin: 0 0 0 50px;
+}
+.right-up {
+	position: absolute;
+	top: 10px;
+	right: -10px;
+	font-size: 18px;
 }
 /*input, button {
 	padding: 9px;
@@ -136,20 +160,34 @@ aside {
   color: #000;
   display: initial;
 }
+.desc input:checked ~ * h4 {
+	color: #000;
+}
 label:hover {
 	text-decoration: underline;
 }
 .desc input:checked ~ label {
-  display: none;
+	display: none;
 }
 .desc label {
-  cursor: pointer;
-  display: inline;
-  color: #00f;
-  font-size: .9em;
+	cursor: pointer;
+	display: inline;
+	color: #00f;
+	font-size: .9em;
 }
 .desc p {
-  display: inline;
+	margin: 10px 0 0;
+	line-height: 1.4;
+}
+.main {
+	color: #999;
+	font-size: 16px;
+	margin: 100px 10px 10px;
+}
+.main label {
+	display: block;
+	text-align: center;
+	color: darkorange;
 }
 h4.grey {
 	margin-top: -20px;

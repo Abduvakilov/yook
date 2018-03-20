@@ -19,7 +19,7 @@ router.get('/search', function(req, res) {
 			if (error) {
 				res.render('error', {message: 'Ошибка', error:{status: error.status, stack:''}})
 			} else {
-				res.render('index', { query: sq, took:response.took, total: response.total, results: response.res, startsWith: from});
+				res.render('search', { query: sq, took:response.took, total: response.total, results: response.res, startsWith: from});
 	  		}
 	  	});
 	} else res.render('index');

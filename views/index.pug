@@ -5,103 +5,21 @@ html
     link(rel='stylesheet' href='/stylesheets/style.css')
     //- h1= title
   body
-    header
+    div.c
+      div.hc
+        img#logol(src="/images/logol.png" height="176" width="380" alt="logo") 
+        span.grey.right-up  α
       form(action='/search' method='get')
-        input(type="text" name="search" autofill="false" id="searchbar" value=query)
+        input(type="text" name="search" autofill="false" id="searchbar" value=query autofocus)
         button(type="submit") Поиск
-        a#logo(href='/')
-          img(src="/images/logo.png" height="37" width="80" alt="logo") 
-        span.grey  α
-    if !results
-      div.noresult
-        p yook.uz - это система для поиска фильмов, программ, игр и других контентов в сети Tas-IX.
-        p yook.uz отличается от других поисковых систем тем что система выдаёт результаты из подобранных сайтов в Tas-ix и специализирован только на поиске файлов что очень важно для экономии трафика. 
-        p Сервис работает в режиме начального тестирование и включает немного, но качественные сайты национальной сети. Свои желания и вопросы по проекту можете отправить по почте 
-          a(style="color:black" href="mailto:d@abduvakilov.me") d@abduvakilov.me
 
-    if results
-      if total==0 
-        div.noresult
-          p По этому запросу в нашем каталоге файлов не найдено.
-          p В нашем каталоге вы можете найти видео, музыки, программи и многое другое в Tas-ix. 
-          br 
-          p Рекомендуем:
-          ul
-            li Убедитесь, что все слова написаны правильно
-            li Поищите в 
-              a(href='https://google.uz/search?q='+encodeURIComponent(query)) Google
-      else
-        span(class='grey') !{took/1000} сек. !{total} результатов.
-        div#wrap
-          section.results
-            for res in results
-              div.result
-                a(href=res.link)
-                  h3= res.title
-                    if (res.songs && res.title.length<30)
-                      |  - ♬
-                div.link= res.link
-                div.desc
-                  span= res.subtitle
-                    if (res.subtitle && res.description)
-                      |  - 
-                  |  !{res.description}
-                  if (res.songs)
-                    | Песни: !{res.songs}
-
-            nav
-              - startsWith = startsWith + 10
-              div.prev
-                if startsWith>19
-                  - var previous = startsWith - 20
-                  a(href='search?search='+encodeURIComponent(query)+'&startsWith='+previous)   Предыдущая 
-                    span  ⇦ 
-              if total> 0 
-                span  Страница: !{startsWith/10} 
-              if total>startsWith 
-                a(href='search?search='+encodeURIComponent(query)+'&startsWith='+startsWith)
-                  span  ⇨ Следующая
-
-
-          if (results[0].ttitle)
-            aside
-              if (typeof results[0].img !== 'undefined')
-                img.poster(src=results[0].img)
-              h1= results[0].ttitle
-              if (results[0].tsub)
-                h4.grey !{results[0].tsub}
-                //- if (results[0].isArtist)
-              div.desc
-
-                if (results[0].genre!=null?results[0].genre.length!=0:false)   
-                  b Жанр: 
-                  | !{Array.isArray(results[0].genre)?results[0].genre.join(', '):results[0].genre}
-
-
-                if (results[0].scores)
-                  div.scores
-                    for val in results[0].scores
-                      if (val[0])
-                        div.score 
-                          big !{val[0]}
-                          small.grey /10
-                          br
-                          span.grey !{val[1]}
-                if (typeof results[0].tdesc !== 'undefined')
-                  div.desc !{results[0].tdesc}
-
-                  //- br
-                if (results[0].tlist.length)
-                  big Песни Исполнителя
-                  if (results[0].tmoreList.length)
-                    input(type="checkbox" id="list")
-                  ol
-                    for item in results[0].tlist
-                      li= item
-                    if (results[0].tmoreList.length)
-                      span.more
-                        for item in results[0].tmoreList
-                          li= item
-                  if (results[0].tmoreList.length)       
-                    label(for="list") Ещё↓
-    footer © 2017
+      div.desc.main
+        input(type="checkbox" id="list")
+        div
+          h4 Поиска фильмов, программ, игр и других контентов в сети Tas-IX.
+          div.more
+            p yook.uz отличается от других поисковых систем тем что система выдаёт результаты из подобранных сайтов в Tas-ix и специализирован только на поиске файлов что очень важно для экономии трафика. 
+            p Сервис работает в режиме начального тестирование и включает немного, но качественные сайты национальной сети. Свои желания и вопросы по проекту можете отправить по почте 
+              a(style="color:black" href="mailto:d@abduvakilov.me") d@abduvakilov.me    
+        label(for="list")  узнать больше ↓
+        
