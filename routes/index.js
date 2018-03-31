@@ -17,7 +17,7 @@ router.get('/search', function(req, res) {
 	if (sq) {
 		search(sq, from, function(error, response) {
 			if (error) {
-				res.render('error', {message: 'Ошибка', error:{status: error.status, stack:''}})
+				res.render('error', {message: 'Ошибка', error:{status: error.status, stack:error.stack}})
 			} else {
 				res.render('search', { query: sq, took:response.took, total: response.total, results: response.res, startsWith: from});
 	  		}

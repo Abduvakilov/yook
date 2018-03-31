@@ -1,10 +1,9 @@
 {
-  "name": "node-elasticsearch",
-  "version": "0.0.0",
+  "name": "yook",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www",
-    "es": "./elasticsearch-5.5.0/bin/elasticsearch"
+    "start": "nodemon ./bin/www"
   },
   "dependencies": {
     "debug": "^2.6.9",

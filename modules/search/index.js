@@ -74,12 +74,12 @@ module.exports = function(sq, from, callback) {
       }
     }
   }, function (error, response) {
-          if (error) console.error(error);
-          let res=[];
-          if (response.hits) {
-            res=result(response.hits.hits, from, wordcount);
-            console.log(res);
-          };
-          callback(error, {res:res,total:response.hits.total,took:response.took});
+          if (error) {
+            console.error(error);
+          } else {
+            var res=result(response.hits.hits, from, wordcount);
+            // console.log(res);
+            callback(error, {res:res,total:response.hits.total,took:response.took});
+        }
     })
 }
