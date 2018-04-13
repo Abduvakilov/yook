@@ -10,8 +10,7 @@ module.exports = {
 search: function(sq, from, callback) {
   let wordcount = sq.trim().split(/\s+/).length;
   // sq = sq + ' ' + transl(sq)
-  console.log(sq);
-
+  console.log(new Date()+ ' '+ sq)
   client.search({
     index: 'targets',
     type: 'targets',
