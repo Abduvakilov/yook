@@ -1,6 +1,6 @@
 body {
 	margin: 40px 0 0 150px;
-	font: 1em "Lucida Grande", Helvetica, Arial, sans-serif;
+	font: 15px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 .grey, footer {
 	color: grey;
@@ -9,7 +9,6 @@ a {
 	display: inline-block;
 	color: #0099FF;
 	text-decoration: none;
-	font-size: 1em;
 }
 a:hover {
 	text-decoration: underline;

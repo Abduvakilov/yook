@@ -6,10 +6,12 @@ const elasticsearch = require('elasticsearch'),
       log: 'error'
     });
 
-module.exports = function(sq, from, callback) {
+module.exports = {
+search: function(sq, from, callback) {
   let wordcount = sq.trim().split(/\s+/).length;
   // sq = sq + ' ' + transl(sq)
   console.log(sq);
+
   client.search({
     index: 'targets',
     type: 'targets',
@@ -82,4 +84,18 @@ module.exports = function(sq, from, callback) {
             callback(error, {res:res,total:response.hits.total,took:response.took});
         }
     })
+},
+log: function(type, sq, useragent, ip){
+  client.index({index:type,type:type,body:{
+    query:sq,
+    datetime: new Date(),
+    useragent: useragent,
+    ip: ip,
+  }}, function (error, response) {
+    if (error) {
+      console.log("error: ", error);
+    }
+  })
+}
+
 }
