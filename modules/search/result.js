@@ -37,7 +37,7 @@ module.exports = function(hits, from, wordcount) {
     			(obj.description?(obj.description.substring(0, 160) + ' ...'):''),
     		hTopList=h.song||(h.single&&h.clip?(h.single.length>=h.clip.length?h.single:h.clip):(h.single||h.clip))||[],
     		topList=obj.song||(obj.single&&obj.clip?(obj.single.length>=obj.clip.length?obj.single:obj.clip):(obj.single||obj.clip))||[];
-		//
+		// i.mover.uz/id*****_t1.jpg
 		
     	let subarr=[];
     	for (st of subtitles) {
@@ -57,7 +57,7 @@ module.exports = function(hits, from, wordcount) {
 				tdesc=(obj.description ? 
 				(obj.description.length>topLength+10 ?
 					('<input type="checkbox" id="post"/><p>'+obj.description.slice(0,topLength)+' <span class="more">'+obj.description.slice(topLength)+'</span></p><label for="post">Ещё↓</label><br>')
-				:''+'<br>')
+				:obj.description)
 			:'');
 			for (let key in topdict){
 				tdesc+=obj[key] ? ('<br><b>' + topdict[key] + ': </b>' + obj[key]) : '';
@@ -72,9 +72,6 @@ module.exports = function(hits, from, wordcount) {
     		title = title.substring(0, 55);
     		title = title.substring(0, title.lastIndexOf(" ")) + ' ...';
 		}
-		if (hits[i]._id.length>70){
-    		hits[i]._id = hits[i]._id.substring(0, 70);
-		};
 	    res[i].title=title;
 	    res[i].subtitle=subtitle;
 	    res[i].img=obj.img;
@@ -90,6 +87,7 @@ module.exports = function(hits, from, wordcount) {
 	    }
 	    res[i].score=hits[i]._score
 	    res[i].isArtist=isArtist;
+
     };
     return res;
 };

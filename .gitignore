@@ -1,4 +1,5 @@
 test/
+comment.txt
 README.MD
 package-lock.json
 node_modules

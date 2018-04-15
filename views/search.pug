@@ -3,7 +3,7 @@ html
   head
     title !{query || 'yook.uz'} | Поиск в Tas-ix
     link(rel='stylesheet' href='/stylesheets/style.css')
-    //- h1= title
+    meta(name="referrer" content="origin")
   body
     header
       form(action='/search' method='get')
@@ -34,13 +34,14 @@ html
                   h3= res.title
                     if (res.songs && res.title.length<30)
                       |  - ♬
-                div.link= res.link
+                div.link= res.link.substring(0, 70)
                 div.desc
                   span= res.subtitle
                     if (res.subtitle && res.description)
                       |  - 
                   |  !{res.description}
                   if (res.songs)
+                    br
                     | Песни: !{res.songs}
 
             nav
